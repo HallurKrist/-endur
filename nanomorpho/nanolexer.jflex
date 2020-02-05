@@ -57,6 +57,8 @@ private static String l1, l2;
 // This runs the scanner:
 public static void main( String[] args ) throws Exception
 {
+     Program prog = new Program();
+     prog.Parse("sumthin");
 	NanoLexer lexer = new NanoLexer(new FileReader(args[0]));
 	int token = lexer.yylex();
 	while( token!=0 )
@@ -64,6 +66,7 @@ public static void main( String[] args ) throws Exception
 		System.out.println(""+token+": \'"+lexeme+"\'");
 		token = lexer.yylex();
 	}
+     
 }
 
 /*
@@ -203,8 +206,7 @@ _OPNAME=([\+\-*/!%=><\:\^\~&|?])
 	return NAME;
 }
 
-
-"//".*$ {
+";;;".*$ {
 }
 
 [ \t\r\n\f] {
@@ -214,3 +216,5 @@ _OPNAME=([\+\-*/!%=><\:\^\~&|?])
 	lexeme = yytext();
 	return ERROR;
 }
+
+
