@@ -58,11 +58,12 @@ private static String l1, l2;
 public static void main( String[] args ) throws Exception
 {
      Program prog = new Program();
-     prog.Parse("sumthin");
+//      prog.Parse("sumthin");
 	NanoLexer lexer = new NanoLexer(new FileReader(args[0]));
 	int token = lexer.yylex();
 	while( token!=0 )
 	{
+                prog.Parse(token);
 		System.out.println(""+token+": \'"+lexeme+"\'");
 		token = lexer.yylex();
 	}

@@ -1,7 +1,7 @@
 public class Program {
-  public static void Parse(String arg) {
-    System.out.println("inni i stuff");
-    System.out.println("arg er " + arg);
+  public static void Parse(int token) {
+    System.out.println("token-id er " + token);
+
   }
 
 
