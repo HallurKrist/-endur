@@ -51,51 +51,73 @@ final static int OP7 = 1107;
 
 // A variable that will contain lexemes as they are recognized:
 private static String lexeme;
-private static int t1, t2;
-private static String l1, l2;
+private static int t1, t2 = 0;              // t1 = current token, t2 = next token
+private static String l1, l2 = "";
 
+/*
 // This runs the scanner:
 public static void main( String[] args ) throws Exception
 {
-     Program prog = new Program();
-//      prog.Parse("sumthin");
 	NanoLexer lexer = new NanoLexer(new FileReader(args[0]));
 	int token = lexer.yylex();
 	while( token!=0 )
 	{
-                prog.Parse(token);
 		System.out.println(""+token+": \'"+lexeme+"\'");
 		token = lexer.yylex();
 	}
-     
 }
+*/
 
-/*
-public static Nanolexer init()
+public void init() throws Exception
 {
-        return new Nanolexer();
-}        
 
-public int advance()
+        t1 = yylex();
+        System.out.println("l1: "+l1);
+        System.out.println("l2: "+l2);
+
+        t2 = yylex();
+
+
+
+}     
+  
+
+public void advance() throws Exception
 {
-        return 0;
+        System.out.println("fyrir advance");
+        System.out.println("t1 er: "+t1);
+        System.out.println("t2 er: "+t2);
+
+        t1 = t2;
+        t2 = yylex();
+
+
+
+        System.out.println("eftir advance");
+        System.out.println("t1 er: "+t1);
+        System.out.println("t2 er: "+t2);
 }
 
 public int getToken()
 {
-        return 0;
+        return t1;
 }
 
-public int getNext()
+public int getNextToken()
 {
-        return 0;
+        return t2;
 }
 
 public String getLexeme()
 {
-        return "";
+        return l1;
 }
-*/
+
+public String getNextLexeme()
+{
+        return l2;
+}
+
 
 %}
 
@@ -118,65 +140,77 @@ _OPNAME=([\+\-*/!%=><\:\^\~&|?])
   /* Lesgreiningarreglur */
   /* Scanning rules */
 "&&" {
-           lexeme = yytext();
-           return AND;
+        l1 = l2;
+        l2 = yytext();
+        return AND;
 }
 
 "||" {
-           lexeme = yytext();
-           return OR;
+        l1 = l2;
+        l2 = yytext();
+        return OR;
 }
 
 "!" {
-           lexeme = yytext();
-           return NOT;
+        l1 = l2;
+        l2 = yytext();
+        return NOT;
 }
 
 {_DELIM} {
-	lexeme = yytext();
+	l1 = l2;
+        l2 = yytext();
 	return yycharat(0);
 }
 
 {_STRING} | {_FLOAT} | {_CHAR} | {_INT} | null | true | false {
-	lexeme = yytext();
+	l1 = l2;
+        l2 = yytext();
 	return LITERAL;
 }
 
 "if" {
-	lexeme = yytext();
+	l1 = l2;
+        l2 = yytext();
 	return IF;
 }
 
 "elsif" {
-        lexeme = yytext();
+        l1 = l2;
+        l2 = yytext();
         return ELSIF;
 }
 
 "else" {
-       lexeme = yytext();
-       return ELSE;
+        l1 = l2;
+        l2 = yytext();
+        return ELSE;
 }
 
 "var" {
-	lexeme = yytext();
+	l1 = l2;
+        l2 = yytext();
 	return VAR;
 }
 
 "while" {
-        lexeme = yytext();
+        l1 = l2;
+        l2 = yytext();
         return WHILE;
 }
 
 "return" {
-         lexeme = yytext();
-         return RETURN;
+        l1 = l2;
+        l2 = yytext();
+        return RETURN;
 }
 
 {_OPNAME} {
-          lexeme = yytext();
-          int token = -1;
-          switch(lexeme)
-          {
+        l1 = l2;
+        l2 = yytext();
+        int token = -1;
+        switch(l2)
+        {
                 case "*": case "/": case "%":
                     token = 1107;
                     break;
@@ -198,12 +232,13 @@ _OPNAME=([\+\-*/!%=><\:\^\~&|?])
                 case "?": case "~": case "^":
                      token = 1101;
                      break;
-           }
-          return token;
+        }
+        return token;
 }
 
 {_NAME} {
-	lexeme = yytext();
+	l1 = l2;
+        l2 = yytext();
 	return NAME;
 }
 
@@ -214,7 +249,8 @@ _OPNAME=([\+\-*/!%=><\:\^\~&|?])
 }
 
 . {
-	lexeme = yytext();
+	l1 = l2;
+        l2 = yytext();
 	return ERROR;
 }
 

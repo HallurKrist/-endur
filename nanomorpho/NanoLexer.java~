@@ -455,51 +455,73 @@ final static int OP7 = 1107;
 
 // A variable that will contain lexemes as they are recognized:
 private static String lexeme;
-private static int t1, t2;
-private static String l1, l2;
+private static int t1, t2 = 0;              // t1 = current token, t2 = next token
+private static String l1, l2 = "";
 
+/*
 // This runs the scanner:
 public static void main( String[] args ) throws Exception
 {
-     Program prog = new Program();
-     prog.Parse("sumthin");
 	NanoLexer lexer = new NanoLexer(new FileReader(args[0]));
 	int token = lexer.yylex();
 	while( token!=0 )
 	{
-                prog.Parse(token);
 		System.out.println(""+token+": \'"+lexeme+"\'");
 		token = lexer.yylex();
 	}
-     
 }
+*/
 
-/*
-public static Nanolexer init()
+public void init() throws Exception
 {
-        return new Nanolexer();
-}        
 
-public int advance()
+        t1 = yylex();
+        System.out.println("l1: "+l1);
+        System.out.println("l2: "+l2);
+
+        t2 = yylex();
+
+
+
+}     
+  
+
+public void advance() throws Exception
 {
-        return 0;
+        System.out.println("fyrir advance");
+        System.out.println("t1 er: "+t1);
+        System.out.println("t2 er: "+t2);
+
+        t1 = t2;
+        t2 = yylex();
+
+
+
+        System.out.println("eftir advance");
+        System.out.println("t1 er: "+t1);
+        System.out.println("t2 er: "+t2);
 }
 
 public int getToken()
 {
-        return 0;
+        return t1;
 }
 
-public int getNext()
+public int getNextToken()
 {
-        return 0;
+        return t2;
 }
 
 public String getLexeme()
 {
-        return "";
+        return l1;
 }
-*/
+
+public String getNextLexeme()
+{
+        return l2;
+}
+
 
 
 
@@ -831,28 +853,32 @@ public String getLexeme()
       else {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1: 
-            { lexeme = yytext();
+            { l1 = l2;
+        l2 = yytext();
 	return ERROR;
             } 
             // fall through
           case 18: break;
           case 2: 
-            { lexeme = yytext();
+            { l1 = l2;
+        l2 = yytext();
 	return LITERAL;
             } 
             // fall through
           case 19: break;
           case 3: 
-            { lexeme = yytext();
+            { l1 = l2;
+        l2 = yytext();
 	return NAME;
             } 
             // fall through
           case 20: break;
           case 4: 
-            { lexeme = yytext();
-          int token = -1;
-          switch(lexeme)
-          {
+            { l1 = l2;
+        l2 = yytext();
+        int token = -1;
+        switch(l1)
+        {
                 case "*": case "/": case "%":
                     token = 1107;
                     break;
@@ -874,20 +900,22 @@ public String getLexeme()
                 case "?": case "~": case "^":
                      token = 1101;
                      break;
-           }
-          return token;
+        }
+        return token;
             } 
             // fall through
           case 21: break;
           case 5: 
-            { lexeme = yytext();
+            { l1 = l2;
+        l2 = yytext();
 	return yycharat(0);
             } 
             // fall through
           case 22: break;
           case 6: 
-            { lexeme = yytext();
-           return NOT;
+            { l1 = l2;
+        l2 = yytext();
+        return NOT;
             } 
             // fall through
           case 23: break;
@@ -897,32 +925,37 @@ public String getLexeme()
             // fall through
           case 24: break;
           case 8: 
-            { lexeme = yytext();
-           return OR;
+            { l1 = l2;
+        l2 = yytext();
+        return OR;
             } 
             // fall through
           case 25: break;
           case 9: 
-            { lexeme = yytext();
-           return AND;
+            { l1 = l2;
+        l2 = yytext();
+        return AND;
             } 
             // fall through
           case 26: break;
           case 10: 
-            { lexeme = yytext();
+            { l1 = l2;
+        l2 = yytext();
 	return IF;
             } 
             // fall through
           case 27: break;
           case 11: 
-            { lexeme = yytext();
+            { l1 = l2;
+        l2 = yytext();
 	return VAR;
             } 
             // fall through
           case 28: break;
           case 12: 
-            { lexeme = yytext();
-       return ELSE;
+            { l1 = l2;
+        l2 = yytext();
+        return ELSE;
             } 
             // fall through
           case 29: break;
@@ -935,13 +968,15 @@ public String getLexeme()
             // fall through
           case 30: break;
           case 14: 
-            { lexeme = yytext();
+            { l1 = l2;
+        l2 = yytext();
         return ELSIF;
             } 
             // fall through
           case 31: break;
           case 15: 
-            { lexeme = yytext();
+            { l1 = l2;
+        l2 = yytext();
         return WHILE;
             } 
             // fall through
@@ -955,8 +990,9 @@ public String getLexeme()
             // fall through
           case 33: break;
           case 17: 
-            { lexeme = yytext();
-         return RETURN;
+            { l1 = l2;
+        l2 = yytext();
+        return RETURN;
             } 
             // fall through
           case 34: break;
