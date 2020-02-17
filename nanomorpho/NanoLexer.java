@@ -476,30 +476,23 @@ public void init() throws Exception
 {
 
         t1 = yylex();
-        System.out.println("l1: "+l1);
-        System.out.println("l2: "+l2);
-
         t2 = yylex();
-
-
 
 }     
   
 
 public void advance() throws Exception
 {
-        System.out.println("fyrir advance");
-        System.out.println("t1 er: "+t1);
-        System.out.println("t2 er: "+t2);
 
+        System.out.println("advancing from token: " + t1);
         t1 = t2;
         t2 = yylex();
+        if (t2 == 0) {
+                l1 = l2;
+                l2 = yytext();    
+        }
+       
 
-
-
-        System.out.println("eftir advance");
-        System.out.println("t1 er: "+t1);
-        System.out.println("t2 er: "+t2);
 }
 
 public int getToken()
@@ -878,7 +871,7 @@ public String getNextLexeme()
         l2 = yytext();
         int token = -1;
         switch(l2)
-        {
+{
                 case "*": case "/": case "%":
                     token = 1107;
                     break;
