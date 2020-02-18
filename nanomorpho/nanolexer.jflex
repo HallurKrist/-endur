@@ -202,7 +202,7 @@ _OPNAME=([\+\-*/!%=><\:\^\~&|?])
         l1 = l2;
         l2 = yytext();
         int token = -1;
-        switch(l2)
+        switch(l2.getCharAt(0);
 {
                 case "*": case "/": case "%":
                     token = 1107;
