@@ -69,205 +69,98 @@ public class Program
                 throw new Error(err("name"));
             }
             lexer.advance();
-            if (lexer.getToken() != 44) {
-
-                // error, expected (
-                return;
+            if (lexer.getToken() != 40) {
+                throw new Error(err("("));
             }
             // Svigi hefur opnast.
             lexer.advance();
 
-            if (name) {
+            if (lexer.getToken == NAME) {
                 lexer.advance();
-                while (lexer.getToken() == 44) {
+                while (lexer.getToken == 44) {
                     // 44 er ','
                     lexer.advance();
-                    if (lexer.getToken()) {
-                        // error expected name
-                        return;
+                    if (lexer.getToken() != NAME) {
+                        throw new Error(err("name"));
                     }
                     lexer.advance();
                 }
             }
-            if (lexer.getToken() != 41) {
-                // error, expected )
-                return;
+
+            if (lexer.getToken != 41) {
+                throw new Error(err(")"));
             }
-            // Svigi hefur lokast og við á taka að "{"
+            // Svigi hefur lokast og við á taka að "{".
             lexer.advance();
 
-            if (lexer.getToken() != 123) {
-                // error expected {
-                return;
+            if (lexer.getToken != 123) {
+                throw new Error(err("{"));
             }
             // Hornklofi hefur opnast.
             lexer.advance();
 
             while (lexer.getToken() == VAR) {
-                lexer.advance();
-                if (!decl()) {
-                    // error, expected declaration
-                    return;
+                decl();
+                if (lexer.getToken() != 59) {
+                    throw new Error(err(";"));
                 }
                 lexer.advance();
             }
             // Búið er að lesa {decl, ';'}
-            // Næst ætti að koma {expr, ';'} , }
+            // Næst ætti að koma {expr, ';'} , '}'
 
-            if (!expr()) {
-                // error expected expression
-                return;
-            }
-
-
-
-
-
-
-            /*
-            if (name())
-            {
-                lexer.advance();
-                if (lexer.getToken() == 40)
-                { //token 40 er "("
-                    lexer.advance();
-                    // XXX
-                    while (name())
-                    {
-                        lexer.advance();
-                        if (lexer.getToken() == 44)
-                        { //token 44 er ","
-                            lexer.advance();
-                            if (name())
-                            {
-                                lexer.advance();
-                            } else
-                            {
-                                //TODO: stop program, expected name after ","
-                            }
-                        }
-                    }
-                    if (lexer.getToken() == 41)
-                    { //token 41 er ")"
-                    // Svigi hefur lokast og hornklofi á að opnast
-                        lexer.advance();
-                        if (lexer.getToken() == 123)
-                        { //token 123 er "{"
-                            lexer.advance();
-                            // XXX
-                            while (decl())
-                            {
-                                lexer.advance();
-                                if (lexer.getToken() == 59)
-                                { //token 59 er ";"
-                                    lexer.advance();
-                                } else
-                                {
-                                    //TODO: stop program, expected ";"
-                                }
-                            }
-                            // XXX
-                            while (expr())
-                            {
-                                lexer.advance();
-                                if (lexer.getToken() == 59)
-                                { //token 59 er ";"
-                                    lexer.advance();
-                                } else
-                                {
-                                    //TODO: stop program, expected ";"
-                                }
-                            }
-                            if (lexer.getToken() == 125)
-                            { //token 125 er "}"
-                                lexer.advance();
-                            } else
-                            {
-                                //TODO: stop program, expected "}"
-                            }
-                        } else
-                        {
-                            //TODO: stop program, expected "{"
-                        }
-                    } else
-                    {
-                        //TODO: stop program, expected close param
-                    }
-                } else
-                {
-                    //TODO: stop program, expected open param
-                }
-            } else
-            {
-                System.out.println("Expected function name");
-            }
-            */
-
-
-
-        } catch (Exception e)
+            expr();
+            if (lexer.getToken() != 125)
+                throw new Error("}");
+        }
+        catch (Exception e)
         {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
     }
 
-    private static boolean name()
+        // decl ='var', NAME, { ',', NAME }
+    private static void decl() throws Exception
     {
-        if (lexer.getToken() == NAME)
-        {
-            throw new Error("Expected name. ")
-                } else
-        {
-            return false;
+        lexer.advance();
+        if (lexer.getToken() != NAME) {
+            throw new Error(err("name"));
         }
-    
-        return false;
-    }
-
-    private static boolean decl()
-    {
-        //lexer.advance();
-        if (!name()) {
-            throw new Error("Expected name. Token is " + lexer.getToken());
-        }
+        lexer.advance();
         while (lexer.getToken == 44) {
             // 44 er ','
             lexer.advance();
             if (lexer.getToken() != NAME) {
-
+                throw new Error(err("name"));
             }
             lexer.advance();
         }
-        if (lexer.getToken() != 59) {
-            // error, expected ';'
-            return false;
-        }
-        return true;
     }
 
-    private static boolean expr()
+    // expr = 'return', expr
+    //      | NAME, '=', expr
+    //      | orexpr
+    private static void expr() throws Exception
     {
         System.out.println("in expr");
-        if (lexer.getToken() == RETURN)
+        int tok = lexer.getToken();
+        if (tok == RETURN)
         {
             lexer.advance();
-            return expr();
-        } else if (name())
-        {
-            lexer.advance();
-            if (lexer.getToken() == 61)
-            { //token 61 er "="
-                lexer.advance();
-                return expr();
-            }
-        } else
-        {
-            orexpr();
+            expr();
+            return;
         }
-        return false;
-
+        if (tok == NAME)
+        {
+            lexer.advance();
+            if (lexer.getToken() != 61)
+                    throw new Error("=");
+            lexer.advance();
+            expr();
+            return;
+        }
+        orexpr();
     }
 
     private static boolean orexpr()
@@ -553,10 +446,10 @@ public class Program
     private static void smallexpr() throws Exception
     {
       System.out.println("in smallexpr");
-        
-      if (lexer.getToken() == NAME) 
+
+      if (lexer.getToken() == NAME)
       {
-        if (lexer.getNextToken() == 40) 
+        if (lexer.getNextToken() == 40)
         {
           lexer.advance();
           lexer.advance();
@@ -567,54 +460,54 @@ public class Program
               expr();
             }
           }
-          if (lexer.getToken() == 41) 
+          if (lexer.getToken() == 41)
           {
             lexer.advance();
           } else
           {
             throw new Error(err(")"));
           }
-        } else 
+        } else
         {
           lexer.advance();
         }
-      } else if (1100 < lexer.getToken() && lexer.getToken() < 1108) 
+      } else if (1100 < lexer.getToken() && lexer.getToken() < 1108)
       {
         opname();
         smallexpr();
-      } else if (lexer.getToken() == LITERAL) 
+      } else if (lexer.getToken() == LITERAL)
       {
         lexer.advance();
-      } else if (lexer.getToken() == 40) 
+      } else if (lexer.getToken() == 40)
       {
         lexer.advance();
         expr();
-        if (lexer.getToken() == 41) 
+        if (lexer.getToken() == 41)
         {
           lexer.advance();
-        } else 
+        } else
         {
           throw new Error(err(")"));
         }
-      } else if (lexer.getToken() == IF)  
+      } else if (lexer.getToken() == IF)
       {
         ifexpr();
-      } else if (lexer.getToken() == WHILE) 
+      } else if (lexer.getToken() == WHILE)
       {
         lexer.advance();
-        if (lexer.getToken() != 40) 
+        if (lexer.getToken() != 40)
         {
           throw new Error(err("("));
-        } 
+        }
         lexer.advance();
         expr();
-        if (lexer.getToken() != 41) 
+        if (lexer.getToken() != 41)
         {
           throw new Error(err(")"));
         }
         lexer.advance();
         body();
-      } else 
+      } else
       {
         throw new Error(err("smallexpr"));
       }
@@ -623,173 +516,85 @@ public class Program
     private static void opname() throws Exception
     {
       System.out.println("in opname");
-      
+
       if (1100 < lexer.getToken() && lexer.getToken() < 1108)
       {
         lexer.advance();
-      } else 
+      } else
       {
           err("operator");
       }
     }
 
-    private static boolean ifexpr()
+    // ifexpr = 'if', '(', expr, ')', body, elsepart;
+    private static boolean ifexpr() throws Exception
     {
         System.out.println("in ifexpr");
-        try
-        {
-            if (lexer.getToken() == 1001)
-            {
-                lexer.advance();
-                if (lexer.getToken() == 40)
-                {
-                    lexer.advance();
-                    if (expr())
-                    {
-                        lexer.advance();
-                        if (lexer.getToken() == 41)
-                        {
-                            lexer.advance();
-                            if (body())
-                            {
-                                lexer.advance();
-                                if (elsepart())
-                                {
-                                    return true;
-                                } else
-                                {
-                                    return false;
-                                }
-                            } else
-                            {
-                                return false;
-                            }
-                        } else
-                        {
-                            return false;
-                        }
-                    } else
-                    {
-                        return false;
-                    }
 
-                } else
-                {
-                    return false;
-                }
-            } else
-            {
-                return false;
-            }
-        } catch (Exception e)
-        {
-            //TODO: handle exception
-        }
-        return false;
+        lexer.advance();
+        if (lexer.getToken != 40)
+            throw new Error("(");
+        lexer.advance();
+        // Búið er að lesa yfir if', '(',
+
+        expr();
+        if (lexer.getToken != 41)
+            throw new Error(")");
+        lexer.advance();
+        // Búið er að lesa yfir 'if', '(', expr, ')',
+
+        body();
+        elsepart();
+        // Búið er að lesa yfir 'if', '(', expr, ')', body, elsepart;
     }
 
-    private static boolean elsepart()
+    // elsepart = /* nothing */
+    //          | 'else', body
+    //          | 'elsif', '(', expr, ')', body, elsepart
+    //          ;
+    private static void elsepart() throws Exception
     {
         System.out.println("in elsepart");
-        try
-        {
-            if (lexer.getToken() == 1007)
-            {
-                lexer.advance();
-                if (body())
-                {
-                    return true;
-                } else
-                {
-                    return false;
-                }
-            } else if (lexer.getToken() == 1006)
-            {
-                lexer.advance();
-                if (lexer.getToken() == 40)
-                {
-                    lexer.advance();
-                    if (expr())
-                    {
-                        lexer.advance();
-                        if (lexer.getToken() == 41)
-                        {
-                            lexer.advance();
-                            if (body())
-                            {
-                                lexer.advance();
-                                if (elsepart())
-                                {
-                                    return true;
-                                } else
-                                {
-                                    return false;
-                                }
-                            } else
-                            {
-                                return false;
-                            }
-                        } else
-                        {
-                            return false;
-                        }
-                    } else
-                    {
-                        return false;
-                    }
-                } else
-                {
-                    return false;
-                }
-            } else
-            {
-                return true;
-            }
 
-        } catch (Exception e)
+        int tok = lexer.getToken();
+        if (tok == ELSE)
         {
-            //TODO: handle exception
+            lexer.advance();
+            body();
+            return;
         }
-        return true;
+        if (tok == ELSIF)
+        {
+            lexer.advance();
+            if (lexer.getToken() != 40)
+                throw new Error("(");
+            lexer.advance();
+            expr();
+            if (lexer.getToken() != 41)
+                throw new Error(")");
+            lexer.advance();
+            body();
+            elsepart();
+        }
+        // if tok is neither ELSE nor ELSEIF, do nothing.
     }
 
-    private static boolean body()
+    // body = '{', { expr, ';' }, '}';
+    private static void body() throws Exception
     {
         System.out.println("in body");
-        try
+
+        if (lexer.getToken() != 123)
+            throw new Error("{");
+        lexer.advance();
+        while (lexer.getToken() != 125)
         {
-            if (lexer.getToken() == 123)
-            {
-                lexer.advance();
-                if (expr())
-                {
-                    lexer.advance();
-                    if (lexer.getToken() == 59)
-                    {
-                        lexer.advance();
-                        if (lexer.getToken() == 125)
-                        {
-                            return true;
-                        } else
-                        {
-                            return false;
-                        }
-                    } else
-                    {
-                        return false;
-                    }
-                } else
-                {
-                    return false;
-                }
-            } else
-            {
-                return false;
-            }
-        } catch (Exception e)
-        {
-            //TODO: handle exception
+            expr();
+            if (lexer.getToken() != 59)
+                throw new Error(";");
+            lexer.advance();
         }
-        return false;
+        lexer.advance();
     }
+
 }
