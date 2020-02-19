@@ -34,6 +34,7 @@ public class Program
   {
     try 
     {
+<<<<<<< Updated upstream
       if (name()) 
       {
         lexer.advance();
@@ -53,11 +54,50 @@ public class Program
               {
                 //TODO: stop program, expected name after ","
               }
+=======
+        try
+        {
+            if (lexer.getToken() != NAME) {
+                throw new Error(err("name"));
+            }
+            lexer.advance();
+            if (lexer.getToken() != 44) {
+
+                // error, expected (
+                return;
+            }
+            // Svigi hefur opnast.
+            lexer.advance();
+
+            if (name()) {
+                lexer.advance();
+                while (lexer.getToken() == 44) {
+                    // 44 er ','
+                    lexer.advance();
+                    if (lexer.getToken()) {
+                        // error expected name
+                        return;
+                    }
+                    lexer.advance();
+                }
+            }
+            if (lexer.getToken() != 41) {
+                // error, expected )
+                return;
+>>>>>>> Stashed changes
             }
           } 
 
+<<<<<<< Updated upstream
           if (lexer.getToken() == 41) 
           { //token 41 er ")"
+=======
+            if (lexer.getToken() != 123) {
+                // error expected {
+                return;
+            }
+            // Hornklofi hefur opnast.
+>>>>>>> Stashed changes
             lexer.advance();
             if (lexer.getToken() == 123) 
             { //token 123 er "{"
@@ -96,11 +136,19 @@ public class Program
             {
               //TODO: stop program, expected "{"
             }
+<<<<<<< Updated upstream
           } else 
           {
             //TODO: stop program, expected close param
           }
         } else 
+=======
+            */
+
+
+
+        } catch(Exception e)
+>>>>>>> Stashed changes
         {
           //TODO: stop program, expected open param
         }
@@ -114,11 +162,38 @@ public class Program
 
     } catch (Exception e) 
     {
+<<<<<<< Updated upstream
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
 
   }
+=======
+        if (lexer.getToken() == NAME)
+        {
+            throw new Error("Expected name. ");
+                } else
+        {
+            return false;
+        }
+    } catch (Exception e)
+        {
+            //TODO: handle exception
+        }
+        return false;
+    }
+
+    private static boolean decl()
+    {
+        //lexer.advance();
+        if (!name()) {
+            throw new Error("Expected name. Token is " + lexer.getToken());
+        }
+        while (lexer.getToken() == 44) {
+            // 44 er ','
+            lexer.advance();
+            if (lexer.getToken() != NAME) {
+>>>>>>> Stashed changes
 
   private static boolean name() 
   {
@@ -175,6 +250,7 @@ public class Program
     return false;
   }
 
+<<<<<<< Updated upstream
   private static boolean expr() 
   {
     try 
@@ -222,10 +298,32 @@ public class Program
     } catch (Exception e) 
     {
       //TODO: handle exception
+=======
+    private static void orexpr()
+    {
+        System.out.println("in orexpr");
+        andexpr();
+        if (lexer.getToken() == OR){
+            lexer.advance();
+            orexpr();
+        }
+        
+    }
+
+    private static void andexpr()
+    {
+        System.out.println("in andexpr");
+        notexpr();
+        if (lexer.getToken() == AND){
+            lexer.advance();
+            andexpr();
+        }
+>>>>>>> Stashed changes
     }
     return false;
   }
 
+<<<<<<< Updated upstream
   private static boolean andexpr() 
   {
     System.out.println("in andexpr");
@@ -243,10 +341,22 @@ public class Program
     } catch (Exception e) 
     {
       //TODO: handle exception
+=======
+    private static void notexpr()
+    {
+        System.out.println("in notexpr");
+            if (lexer.getToken() == NOT){
+                lexer.advance();
+                notexpr();
+            }  
+            else 
+            binopexpr1();
+>>>>>>> Stashed changes
     }
     return false;
   }
 
+<<<<<<< Updated upstream
   private static boolean notexpr() 
   {
     System.out.println("in notexpr");
@@ -303,12 +413,24 @@ public class Program
     }
     return false;
   }
+=======
+    private static void binopexpr1()
+    {
+        binopexpr2();
+        while(lexer.getToken() == OP1){
+            lexer.advance();
+            binopexpr2();
+        }
+    }
+                    
+>>>>>>> Stashed changes
 
   private static boolean binopexpr2() 
   {
     System.out.println("in binopexpr2");
     try 
     {
+<<<<<<< Updated upstream
       if (binopexpr3()) 
       {
         lexer.advance();
@@ -330,10 +452,19 @@ public class Program
     } catch (Exception e) 
     {
       //TODO: handle exception
+=======
+        
+        binopexpr3();
+        if(lexer.getToken() == OP2){
+            lexer.advance();
+            binopexpr2();
+        }
+>>>>>>> Stashed changes
     }
     return false;
   }
 
+<<<<<<< Updated upstream
   private static boolean binopexpr3() 
   {
     System.out.println("in binopexpr3");
@@ -360,10 +491,20 @@ public class Program
     } catch (Exception e) 
     {
       //TODO: handle exception
+=======
+    private static void binopexpr3()
+    {
+        binopexpr4();
+        while(lexer.getToken() == OP3){
+            lexer.advance();
+            binopexpr4();
+        } 
+>>>>>>> Stashed changes
     }
     return false;
   }
 
+<<<<<<< Updated upstream
   private static boolean binopexpr4() 
   {
     System.out.println("in binopexpr4");
@@ -420,10 +561,29 @@ public class Program
     } catch (Exception e) 
     {
       //TODO: handle exception
+=======
+    private static void binopexpr4()
+    {
+        binopexpr5();
+        while(lexer.getToken() == OP4){
+            lexer.advance();
+            binopexpr5();
+        } 
+    }
+    
+    private static void binopexpr5()
+    {
+        binopexpr6();
+        while(lexer.getToken() == OP5){
+            lexer.advance();
+            binopexpr6();
+        } 
+>>>>>>> Stashed changes
     }
     return false; 
   }
 
+<<<<<<< Updated upstream
   private static boolean binopexpr6() 
   {
     System.out.println("in binopexpr6");
@@ -480,6 +640,24 @@ public class Program
     } catch (Exception e) 
     {
       //TODO: handle exception
+=======
+    private static void binopexpr6()
+    {
+        binopexpr7();
+        while(lexer.getToken() == OP6){
+            lexer.advance();
+            binopexpr7();
+        } 
+    }
+
+    private static void binopexpr7()
+    {
+        smallexpr();
+        while(lexer.getToken() == OP7){
+            lexer.advance();
+            smallexpr();
+        } 
+>>>>>>> Stashed changes
     }
     return false; 
   }
