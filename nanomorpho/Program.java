@@ -75,9 +75,9 @@ public class Program
             // Svigi hefur opnast.
             lexer.advance();
 
-            if (lexer.getToken == NAME) {
+            if (lexer.getToken() == NAME) {
                 lexer.advance();
-                while (lexer.getToken == 44) {
+                while (lexer.getToken() == 44) {
                     // 44 er ','
                     lexer.advance();
                     if (lexer.getToken() != NAME) {
@@ -87,13 +87,13 @@ public class Program
                 }
             }
 
-            if (lexer.getToken != 41) {
+            if (lexer.getToken() != 41) {
                 throw new Error(err(")"));
             }
             // Svigi hefur lokast og við á taka að "{".
             lexer.advance();
 
-            if (lexer.getToken != 123) {
+            if (lexer.getToken() != 123) {
                 throw new Error(err("{"));
             }
             // Hornklofi hefur opnast.
@@ -128,7 +128,7 @@ public class Program
             throw new Error(err("name"));
         }
         lexer.advance();
-        while (lexer.getToken == 44) {
+        while (lexer.getToken() == 44) {
             // 44 er ','
             lexer.advance();
             if (lexer.getToken() != NAME) {
@@ -163,284 +163,101 @@ public class Program
         orexpr();
     }
 
-    private static boolean orexpr()
+    private static void orexpr() throws Exception
     {
         System.out.println("in orexpr");
-        try
-        {
-            if (andexpr())
-            {
-                lexer.advance();
-                if (lexer.getToken() == 1012)
-                {
-                    lexer.advance();
-                    return orexpr();
-                }
-                return true;
-            }
-        } catch (Exception e)
-        {
-            //TODO: handle exception
+        andexpr();
+        lexer.advance();
+        if (lexer.getToken() == OR){
+            lexer.advance();
+            orexpr();
         }
-        return false;
     }
 
-    private static boolean andexpr()
+    private static void andexpr() throws Exception
     {
         System.out.println("in andexpr");
-        try
-        {
-            if (notexpr())
-            {
-                lexer.advance();
-                if (lexer.getToken() == 1011)
-                {
-                    return andexpr();
-                }
-                return true;
-            }
-        } catch (Exception e)
-        {
-            //TODO: handle exception
+        notexpr();
+        lexer.advance();
+        if (lexer.getToken() == AND){
+            lexer.advance();
+            andexpr();
         }
-        return false;
     }
 
-    private static boolean notexpr()
+    private static void notexpr() throws Exception
     {
         System.out.println("in notexpr");
-        try
-        {
-            if (lexer.getToken() == 1013)
-            {
-                lexer.advance();
-                if (notexpr())
-                {
-                    return true;
-                } else
-                {
-                    return false;
-                }
-            } else if (binopexpr1())
-            {
-                return true;
-            } else
-            {
-                return false;
-            }
-        } catch (Exception e)
-        {
-            //TODO: handle exception
+        if (lexer.getToken() == NOT){
+            lexer.advance();
+            notexpr();
+            return;
         }
-        return false;
+        binopexpr1();
     }
 
-    private static boolean binopexpr1()
+
+    private static void binopexpr1() throws Exception
     {
-        System.out.println("in binopexpr1");
-        try
-        {
-            if (binopexpr2())
-            {
-                lexer.advance();
-                if (lexer.getToken() == 1101)
-                {
-                    lexer.advance();
-                    if (binopexpr2())
-                    {
-                        return true;
-                    } else
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        } catch (Exception e)
-        {
-            //TODO: handle exception
+        binopexpr2();
+        while(lexer.getToken() == OP1){
+            lexer.advance();
+            binopexpr2();
         }
-        return false;
     }
 
-    private static boolean binopexpr2()
+    private static void binopexpr2() throws Exception
     {
-        System.out.println("in binopexpr2");
-        try
-        {
-            if (binopexpr3())
-            {
-                lexer.advance();
-                if (lexer.getToken() == 1102)
-                {
-                    lexer.advance();
-                    if (binopexpr3())
-                    {
-                        return true;
-                    } else
-                    {
-                        return false;
-                    }
-                } else
-                {
-                    return true;
-                }
-            }
-        } catch (Exception e)
-        {
-            //TODO: handle exception
+        binopexpr3();
+        if(lexer.getToken() == OP2){
+            lexer.advance();
+            binopexpr2();
         }
-        return false;
     }
 
-    private static boolean binopexpr3()
+    private static void binopexpr3() throws Exception
     {
-        System.out.println("in binopexpr3");
-        try
-        {
-            if (binopexpr4())
-            {
-                lexer.advance();
-                if (lexer.getToken() == 1103)
-                {
-                    lexer.advance();
-                    if (binopexpr4())
-                    {
-                        return true;
-                    } else
-                    {
-                        return false;
-                    }
-                } else
-                {
-                    return true;
-                }
-            }
-        } catch (Exception e)
-        {
-            //TODO: handle exception
+        binopexpr4();
+        while(lexer.getToken() == OP3){
+            lexer.advance();
+            binopexpr4();
         }
-        return false;
     }
 
-    private static boolean binopexpr4()
+    private static void binopexpr4() throws Exception
     {
-        System.out.println("in binopexpr4");
-        try
-        {
-            if (binopexpr5())
-            {
-                lexer.advance();
-                if (lexer.getToken() == 1104)
-                {
-                    lexer.advance();
-                    if (binopexpr5())
-                    {
-                        return true;
-                    } else
-                    {
-                        return false;
-                    }
-                } else
-                {
-                    return true;
-                }
-            }
-        } catch (Exception e)
-        {
-            //TODO: handle exception
+        binopexpr5();
+        while(lexer.getToken() == OP4){
+            lexer.advance();
+            binopexpr5();
         }
-        return false;
     }
 
-    private static boolean binopexpr5()
+    private static void binopexpr5() throws Exception
     {
-        System.out.println("in binopexpr5");
-        try
-        {
-            if (binopexpr6())
-            {
-                lexer.advance();
-                if (lexer.getToken() == 1105)
-                {
-                    lexer.advance();
-                    if (binopexpr6())
-                    {
-                        return true;
-                    } else
-                    {
-                        return false;
-                    }
-                } else
-                {
-                    return true;
-                }
-            }
-        } catch (Exception e)
-        {
-            //TODO: handle exception
+        binopexpr6();
+        while(lexer.getToken() == OP5){
+            lexer.advance();
+            binopexpr6();
         }
-        return false;
     }
 
-    private static boolean binopexpr6()
+    private static void binopexpr6() throws Exception
     {
-        System.out.println("in binopexpr6");
-        try
-        {
-            if (binopexpr7())
-            {
-                lexer.advance();
-                if (lexer.getToken() == 1106)
-                {
-                    lexer.advance();
-                    if (binopexpr7())
-                    {
-                        return true;
-                    } else
-                    {
-                        return false;
-                    }
-                } else
-                {
-                    return true;
-                }
-            }
-        } catch (Exception e)
-        {
-            //TODO: handle exception
+        binopexpr7();
+        while(lexer.getToken() == OP6){
+            lexer.advance();
+            binopexpr7();
         }
-        return false;
     }
 
-    private static boolean binopexpr7()
+    private static void binopexpr7() throws Exception
     {
-        System.out.println("in binopexpr7");
-        try
-        {
-            if (smallexpr())
-            {
-                lexer.advance();
-                if (lexer.getToken() == 1107)
-                {
-                    lexer.advance();
-                    if (smallexpr())
-                    {
-                        return true;
-                    } else
-                    {
-                        return false;
-                    }
-                } else
-                {
-                    return true;
-                }
-            }
-        } catch (Exception e)
-        {
-            //TODO: handle exception
+        smallexpr();
+        while(lexer.getToken() == OP7){
+            lexer.advance();
+            smallexpr();
         }
-        return false;
     }
 
     private static void smallexpr() throws Exception
@@ -527,18 +344,18 @@ public class Program
     }
 
     // ifexpr = 'if', '(', expr, ')', body, elsepart;
-    private static boolean ifexpr() throws Exception
+    private static void ifexpr() throws Exception
     {
         System.out.println("in ifexpr");
 
         lexer.advance();
-        if (lexer.getToken != 40)
+        if (lexer.getToken() != 40)
             throw new Error("(");
         lexer.advance();
         // Búið er að lesa yfir if', '(',
 
         expr();
-        if (lexer.getToken != 41)
+        if (lexer.getToken() != 41)
             throw new Error(")");
         lexer.advance();
         // Búið er að lesa yfir 'if', '(', expr, ')',
