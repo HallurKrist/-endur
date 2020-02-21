@@ -61,6 +61,8 @@ public class Program
         }
     }
 
+    // function	= 	NAME, '(', [ NAME, { ',', NAME } ] ')'
+	// 			    '{', { decl, ';' }, { expr, ';' }, '}'
     private static void function()
     {
         try
@@ -163,6 +165,7 @@ public class Program
         orexpr();
     }
 
+    // orexpr = andexpr, [ '||', orexpr ]
     private static void orexpr() throws Exception
     {
         System.out.println("in orexpr");
@@ -174,6 +177,7 @@ public class Program
         }
     }
 
+    // andexpr = notexpr, [ '||', andexpr]
     private static void andexpr() throws Exception
     {
         System.out.println("in andexpr");
@@ -185,6 +189,7 @@ public class Program
         }
     }
 
+    // notexpr = '!', notexpr | binopexpr1
     private static void notexpr() throws Exception
     {
         System.out.println("in notexpr");
@@ -196,7 +201,7 @@ public class Program
         binopexpr1();
     }
 
-
+    // binopexpr1 = binopexpr2, { OPNAME1 binopexpr2 }
     private static void binopexpr1() throws Exception
     {
         binopexpr2();
@@ -206,6 +211,7 @@ public class Program
         }
     }
 
+    // binopexpr2 =	binopexpr3, [ OPNAME2, binopexpr2 ]
     private static void binopexpr2() throws Exception
     {
         binopexpr3();
@@ -215,6 +221,7 @@ public class Program
         }
     }
 
+    // binopexpr3 =	binopexpr4, { OPNAME3, binopexpr4 }
     private static void binopexpr3() throws Exception
     {
         binopexpr4();
@@ -224,6 +231,7 @@ public class Program
         }
     }
 
+    // binopexpr4 =	binopexpr5, { OPNAME4, binopexpr5 }
     private static void binopexpr4() throws Exception
     {
         binopexpr5();
@@ -233,6 +241,7 @@ public class Program
         }
     }
 
+    // binopexpr5 =	binopexpr6, { OPNAME5, binopexpr6 }
     private static void binopexpr5() throws Exception
     {
         binopexpr6();
@@ -242,6 +251,7 @@ public class Program
         }
     }
 
+    // binopexpr6 =	binopexpr7, { OPNAME6, binopexpr7 }
     private static void binopexpr6() throws Exception
     {
         binopexpr7();
@@ -251,6 +261,7 @@ public class Program
         }
     }
 
+    // binopexpr7 =	smallexpr, { OPNAME7, smallexpr }
     private static void binopexpr7() throws Exception
     {
         smallexpr();
@@ -260,6 +271,13 @@ public class Program
         }
     }
 
+    // smallexpr = NAME
+	// 		    |	NAME, '(', [ expr, { ',', expr } ], ')'
+	// 		    |	opname, smallexpr
+	// 		    | 	LITERAL 
+	// 		    |	'(', expr, ')'
+	// 		    |	ifexpr
+	// 		    |	'while', '(', expr, ')', body
     private static void smallexpr() throws Exception
     {
       System.out.println("in smallexpr");
@@ -330,6 +348,13 @@ public class Program
       }
     }
 
+    // opname		=	OPNAME1
+	// 		        |	OPNAME2
+	// 		        |	OPNAME3
+	// 		        |	OPNAME4
+	// 		        |	OPNAME5
+	// 		        |	OPNAME6
+	// 		        |	OPNAME7
     private static void opname() throws Exception
     {
       System.out.println("in opname");
