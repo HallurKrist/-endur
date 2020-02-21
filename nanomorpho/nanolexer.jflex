@@ -18,6 +18,8 @@ import java.io.*;
 %class NanoLexer
 %unicode
 %byaccj
+%line
+%column
 
 %{
 
@@ -53,11 +55,16 @@ final static int OP7 = 1107;
 private static String lexeme;
 private static int t1, t2 = 0;              // t1 = current token, t2 = next token
 private static String l1, l2 = "";
+private static int line1, line2 = 0;
+private static int column1, column2 =0;
 
-/*
+
 // This runs the scanner:
-public static void main( String[] args ) throws Exception
+public static void main(String[] args) throws Exception
 {
+        NanoLexer lexer = new NanoLexer(new FileReader(args[0]));
+        lexer.init();
+        /*
 	NanoLexer lexer = new NanoLexer(new FileReader(args[0]));
 	int token = lexer.yylex();
 	while( token!=0 )
@@ -65,8 +72,9 @@ public static void main( String[] args ) throws Exception
 		System.out.println(""+token+": \'"+lexeme+"\'");
 		token = lexer.yylex();
 	}
+        */
 }
-*/
+
 
 public void init() throws Exception
 {
@@ -83,6 +91,10 @@ public void advance() throws Exception
         System.out.println("advancing from token: " + t1 + " (" + l1 + ") to " + t2 + " (" + l2 + ")");
         t1 = t2;
         t2 = yylex();
+        line1 = line2;
+        line2 = yyline;
+        column1 = column2;
+        column1 = yycolumn;
         if (t2 == 0) {
                 l1 = l2;
                 l2 = yytext();    
@@ -109,6 +121,16 @@ public String getLexeme()
 public String getNextLexeme()
 {
         return l2;
+}
+
+public int getLine()
+{
+        return line1;
+}
+
+public int getColumn()
+{
+        return column1;
 }
 
 
@@ -202,27 +224,27 @@ _OPNAME=([\+\-*/!%=><\:\^\~&|?])
         l1 = l2;
         l2 = yytext();
         int token = -1;
-        switch(l2.getCharAt(0);
+        switch(l2.charAt(0))
 {
-                case "*": case "/": case "%":
+                case '*': case '/': case '%':
                     token = 1107;
                     break;
-                case "+": case "-":
+                case '+': case '-':
                      token = 1106;
                      break;
-                case "<": case ">": case "!": case "=":
+                case '<': case '>': case '!': case '=':
                      token = 1105;
                      break;
-                case "&":
+                case '&':
                      token = 1104;
                      break;
-                case "|":
+                case '|':
                      token = 1103;
                      break;
-                case ":":
+                case ':':
                      token = 1102;
                      break;
-                case "?": case "~": case "^":
+                case '?': case '~': case '^':
                      token = 1101;
                      break;
         }

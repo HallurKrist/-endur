@@ -40,8 +40,11 @@ public class Program
 
     private static String err(String tok)
     {
-        String e = "Expected " + tok + " . Next token is " + lexer.getToken();
-        return e;
+        int line = lexer.getLine() + 1;
+        int column = lexer.getColumn() + 1;
+        String pos = "Error in line " + line + ", column " + column;
+        String e = ". Expected " + tok + " . Next lexem is " + lexer.getLexeme();
+        return pos + e;
     }
 
     public static void parse()
@@ -109,7 +112,15 @@ public class Program
             // Búið er að lesa {decl, ';'}
             // Næst ætti að koma {expr, ';'} , '}'
 
-            expr();
+            // XXX while (expr()) next is ;
+            while (lexer.getToken() != 125) {
+                expr();
+                if (lexer.getToken() != 59)
+                    throw new Error(";");
+                lexer.advance();
+            }
+            // expr();
+            System.out.println("Only } left");
             if (lexer.getToken() != 125)
                 throw new Error("}");
         }
@@ -123,6 +134,7 @@ public class Program
         // decl ='var', NAME, { ',', NAME }
     private static void decl() throws Exception
     {
+        System.out.println("in decl");
         lexer.advance();
         if (lexer.getToken() != NAME) {
             throw new Error(err("name"));
@@ -155,7 +167,7 @@ public class Program
         {
             lexer.advance();
             if (lexer.getToken() != 61)
-                    throw new Error("=");
+                throw new Error(err("="));
             lexer.advance();
             expr();
             return;
@@ -167,7 +179,7 @@ public class Program
     {
         System.out.println("in orexpr");
         andexpr();
-        lexer.advance();
+        //lexer.advance();
         if (lexer.getToken() == OR){
             lexer.advance();
             orexpr();
@@ -178,7 +190,7 @@ public class Program
     {
         System.out.println("in andexpr");
         notexpr();
-        lexer.advance();
+        //lexer.advance();
         if (lexer.getToken() == AND){
             lexer.advance();
             andexpr();
@@ -286,6 +298,7 @@ public class Program
           }
         } else
         {
+            System.out.println("just NAME");
           lexer.advance();
         }
       } else if (1100 < lexer.getToken() && lexer.getToken() < 1108)
@@ -294,16 +307,20 @@ public class Program
         smallexpr();
       } else if (lexer.getToken() == LITERAL)
       {
+          System.out.println("LITERAL");
         lexer.advance();
       } else if (lexer.getToken() == 40)
       {
+          System.out.println("svigi opnast   (");
         lexer.advance();
         expr();
+        System.out.println("núna ætti svigi að lokast");
         if (lexer.getToken() == 41)
         {
           lexer.advance();
         } else
         {
+            System.out.println(")))))))");
           throw new Error(err(")"));
         }
       } else if (lexer.getToken() == IF)

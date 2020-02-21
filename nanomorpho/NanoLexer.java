@@ -457,11 +457,16 @@ final static int OP7 = 1107;
 private static String lexeme;
 private static int t1, t2 = 0;              // t1 = current token, t2 = next token
 private static String l1, l2 = "";
+private static int line1, line2 = 0;
+private static int column1, column2 =0;
 
-/*
+
 // This runs the scanner:
-public static void main( String[] args ) throws Exception
+public static void main(String[] args) throws Exception
 {
+        NanoLexer lexer = new NanoLexer(new FileReader(args[0]));
+        lexer.init();
+        /*
 	NanoLexer lexer = new NanoLexer(new FileReader(args[0]));
 	int token = lexer.yylex();
 	while( token!=0 )
@@ -469,8 +474,9 @@ public static void main( String[] args ) throws Exception
 		System.out.println(""+token+": \'"+lexeme+"\'");
 		token = lexer.yylex();
 	}
+        */
 }
-*/
+
 
 public void init() throws Exception
 {
@@ -487,6 +493,10 @@ public void advance() throws Exception
         System.out.println("advancing from token: " + t1 + " (" + l1 + ") to " + t2 + " (" + l2 + ")");
         t1 = t2;
         t2 = yylex();
+        line1 = line2;
+        line2 = yyline;
+        column1 = column2;
+        column1 = yycolumn;
         if (t2 == 0) {
                 l1 = l2;
                 l2 = yytext();    
@@ -513,6 +523,16 @@ public String getLexeme()
 public String getNextLexeme()
 {
         return l2;
+}
+
+public int getLine()
+{
+        return line1;
+}
+
+public int getColumn()
+{
+        return column1;
 }
 
 
@@ -778,6 +798,62 @@ public String getNextLexeme()
     while (true) {
       zzMarkedPosL = zzMarkedPos;
 
+      boolean zzR = false;
+      int zzCh;
+      int zzCharCount;
+      for (zzCurrentPosL = zzStartRead  ;
+           zzCurrentPosL < zzMarkedPosL ;
+           zzCurrentPosL += zzCharCount ) {
+        zzCh = Character.codePointAt(zzBufferL, zzCurrentPosL, zzMarkedPosL);
+        zzCharCount = Character.charCount(zzCh);
+        switch (zzCh) {
+        case '\u000B':  // fall through
+        case '\u000C':  // fall through
+        case '\u0085':  // fall through
+        case '\u2028':  // fall through
+        case '\u2029':
+          yyline++;
+          yycolumn = 0;
+          zzR = false;
+          break;
+        case '\r':
+          yyline++;
+          yycolumn = 0;
+          zzR = true;
+          break;
+        case '\n':
+          if (zzR)
+            zzR = false;
+          else {
+            yyline++;
+            yycolumn = 0;
+          }
+          break;
+        default:
+          zzR = false;
+          yycolumn += zzCharCount;
+        }
+      }
+
+      if (zzR) {
+        // peek one character ahead if it is \n (if we have counted one line too much)
+        boolean zzPeek;
+        if (zzMarkedPosL < zzEndReadL)
+          zzPeek = zzBufferL[zzMarkedPosL] == '\n';
+        else if (zzAtEOF)
+          zzPeek = false;
+        else {
+          boolean eof = zzRefill();
+          zzEndReadL = zzEndRead;
+          zzMarkedPosL = zzMarkedPos;
+          zzBufferL = zzBuffer;
+          if (eof) 
+            zzPeek = false;
+          else 
+            zzPeek = zzBufferL[zzMarkedPosL] == '\n';
+        }
+        if (zzPeek) yyline--;
+      }
       zzAction = -1;
 
       zzCurrentPosL = zzCurrentPos = zzStartRead = zzMarkedPosL;
@@ -870,27 +946,27 @@ public String getNextLexeme()
             { l1 = l2;
         l2 = yytext();
         int token = -1;
-        switch(l2)
+        switch(l2.charAt(0))
 {
-                case "*": case "/": case "%":
+                case '*': case '/': case '%':
                     token = 1107;
                     break;
-                case "+": case "-":
+                case '+': case '-':
                      token = 1106;
                      break;
-                case "<": case ">": case "!": case "=":
+                case '<': case '>': case '!': case '=':
                      token = 1105;
                      break;
-                case "&":
+                case '&':
                      token = 1104;
                      break;
-                case "|":
+                case '|':
                      token = 1103;
                      break;
-                case ":":
+                case ':':
                      token = 1102;
                      break;
-                case "?": case "~": case "^":
+                case '?': case '~': case '^':
                      token = 1101;
                      break;
         }
