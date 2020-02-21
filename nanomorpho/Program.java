@@ -40,8 +40,11 @@ public class Program
 
     private static String err(String tok)
     {
-        String e = "Expected " + tok + " . Next token is " + lexer.getToken();
-        return e;
+        int line = lexer.getLine() + 1;
+        int column = lexer.getColumn() + 1;
+        String pos = "\nError in line " + line + ", column " + column;
+        String e = ".\nExpected " + tok + ". Next lexeme is \'" + lexer.getLexeme() + "\'";
+        return pos + e;
     }
 
     public static void parse()
@@ -51,12 +54,10 @@ public class Program
             function();
             while (lexer.getToken() != 0)
             {
-                System.out.println("call function again");
                 function();
             }
         } catch (Exception e)
         {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -111,18 +112,24 @@ public class Program
             // Búið er að lesa {decl, ';'}
             // Næst ætti að koma {expr, ';'} , '}'
 
-            expr();
+            while (lexer.getToken() != 125) {
+                expr();
+                if (lexer.getToken() != 59)
+                    throw new Error(err(";"));
+                lexer.advance();
+            }
+
             if (lexer.getToken() != 125)
-                throw new Error("}");
+                throw new Error(err("}"));
+            lexer.advance();
         }
         catch (Exception e)
         {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
-        // decl ='var', NAME, { ',', NAME }
+    // decl ='var', NAME, { ',', NAME }
     private static void decl() throws Exception
     {
         lexer.advance();
@@ -145,7 +152,6 @@ public class Program
     //      | orexpr
     private static void expr() throws Exception
     {
-        System.out.println("in expr");
         int tok = lexer.getToken();
         if (tok == RETURN)
         {
@@ -153,11 +159,9 @@ public class Program
             expr();
             return;
         }
-        if (tok == NAME)
+        if (tok == NAME && lexer.getNextToken() == 61)
         {
             lexer.advance();
-            if (lexer.getToken() != 61)
-                    throw new Error("=");
             lexer.advance();
             expr();
             return;
@@ -168,9 +172,7 @@ public class Program
     // orexpr = andexpr, [ '||', orexpr ]
     private static void orexpr() throws Exception
     {
-        System.out.println("in orexpr");
         andexpr();
-        lexer.advance();
         if (lexer.getToken() == OR){
             lexer.advance();
             orexpr();
@@ -180,9 +182,7 @@ public class Program
     // andexpr = notexpr, [ '||', andexpr]
     private static void andexpr() throws Exception
     {
-        System.out.println("in andexpr");
         notexpr();
-        lexer.advance();
         if (lexer.getToken() == AND){
             lexer.advance();
             andexpr();
@@ -192,7 +192,6 @@ public class Program
     // notexpr = '!', notexpr | binopexpr1
     private static void notexpr() throws Exception
     {
-        System.out.println("in notexpr");
         if (lexer.getToken() == NOT){
             lexer.advance();
             notexpr();
@@ -280,8 +279,6 @@ public class Program
 	// 		    |	'while', '(', expr, ')', body
     private static void smallexpr() throws Exception
     {
-      System.out.println("in smallexpr");
-
       if (lexer.getToken() == NAME)
       {
         if (lexer.getNextToken() == 40)
@@ -357,8 +354,6 @@ public class Program
 	// 		        |	OPNAME7
     private static void opname() throws Exception
     {
-      System.out.println("in opname");
-
       if (1100 < lexer.getToken() && lexer.getToken() < 1108)
       {
         lexer.advance();
@@ -371,17 +366,15 @@ public class Program
     // ifexpr = 'if', '(', expr, ')', body, elsepart;
     private static void ifexpr() throws Exception
     {
-        System.out.println("in ifexpr");
-
         lexer.advance();
         if (lexer.getToken() != 40)
-            throw new Error("(");
+            throw new Error(err("("));
         lexer.advance();
         // Búið er að lesa yfir if', '(',
 
         expr();
         if (lexer.getToken() != 41)
-            throw new Error(")");
+            throw new Error(err(")"));
         lexer.advance();
         // Búið er að lesa yfir 'if', '(', expr, ')',
 
@@ -396,8 +389,6 @@ public class Program
     //          ;
     private static void elsepart() throws Exception
     {
-        System.out.println("in elsepart");
-
         int tok = lexer.getToken();
         if (tok == ELSE)
         {
@@ -409,11 +400,11 @@ public class Program
         {
             lexer.advance();
             if (lexer.getToken() != 40)
-                throw new Error("(");
+                throw new Error(err("("));
             lexer.advance();
             expr();
             if (lexer.getToken() != 41)
-                throw new Error(")");
+                throw new Error(err(")"));
             lexer.advance();
             body();
             elsepart();
@@ -424,16 +415,14 @@ public class Program
     // body = '{', { expr, ';' }, '}';
     private static void body() throws Exception
     {
-        System.out.println("in body");
-
         if (lexer.getToken() != 123)
-            throw new Error("{");
+            throw new Error(err("{"));
         lexer.advance();
         while (lexer.getToken() != 125)
         {
             expr();
             if (lexer.getToken() != 59)
-                throw new Error(";");
+                throw new Error(err(";"));
             lexer.advance();
         }
         lexer.advance();
