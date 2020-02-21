@@ -94,7 +94,7 @@ public void advance() throws Exception
         line1 = line2;
         line2 = yyline;
         column1 = column2;
-        column1 = yycolumn;
+        column2 = yycolumn;
         if (t2 == 0) {
                 l1 = l2;
                 l2 = yytext();    
@@ -148,7 +148,7 @@ _CHAR=\'([^\'\\]|\\b|\\t|\\n|\\f|\\r|\\\"|\\\'|\\\\|(\\[0-3][0-7][0-7])|(\\[0-7]
 _DELIM=[(){},;=]
 _NAME=([:letter:]|{_DIGIT}|[_])+
 _BOOLEAN=['!'|'&&'|'||']
-_OPNAME=([\+\-*/!%=><\:\^\~&|?])
+_OPNAME=([\+\-*/!%=><\:\^\~&|?])+
 
 %%
 

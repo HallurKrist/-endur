@@ -42,8 +42,8 @@ public class Program
     {
         int line = lexer.getLine() + 1;
         int column = lexer.getColumn() + 1;
-        String pos = "Error in line " + line + ", column " + column;
-        String e = ". Expected " + tok + " . Next lexem is " + lexer.getLexeme();
+        String pos = "\nError in line " + line + ", column " + column;
+        String e = ".\nExpected " + tok + ". Next lexeme is \'" + lexer.getLexeme() + "\'";
         return pos + e;
     }
 
@@ -54,12 +54,10 @@ public class Program
             function();
             while (lexer.getToken() != 0)
             {
-                System.out.println("call function again");
                 function();
             }
         } catch (Exception e)
         {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -112,29 +110,26 @@ public class Program
             // Búið er að lesa {decl, ';'}
             // Næst ætti að koma {expr, ';'} , '}'
 
-            // XXX while (expr()) next is ;
             while (lexer.getToken() != 125) {
                 expr();
                 if (lexer.getToken() != 59)
-                    throw new Error(";");
+                    throw new Error(err(";"));
                 lexer.advance();
             }
-            // expr();
-            System.out.println("Only } left");
+
             if (lexer.getToken() != 125)
-                throw new Error("}");
+                throw new Error(err("}"));
+            lexer.advance();
         }
         catch (Exception e)
         {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
-        // decl ='var', NAME, { ',', NAME }
+    // decl ='var', NAME, { ',', NAME }
     private static void decl() throws Exception
     {
-        System.out.println("in decl");
         lexer.advance();
         if (lexer.getToken() != NAME) {
             throw new Error(err("name"));
@@ -155,7 +150,6 @@ public class Program
     //      | orexpr
     private static void expr() throws Exception
     {
-        System.out.println("in expr");
         int tok = lexer.getToken();
         if (tok == RETURN)
         {
@@ -163,11 +157,9 @@ public class Program
             expr();
             return;
         }
-        if (tok == NAME)
+        if (tok == NAME && lexer.getNextToken() == 61)
         {
             lexer.advance();
-            if (lexer.getToken() != 61)
-                throw new Error(err("="));
             lexer.advance();
             expr();
             return;
@@ -177,9 +169,7 @@ public class Program
 
     private static void orexpr() throws Exception
     {
-        System.out.println("in orexpr");
         andexpr();
-        //lexer.advance();
         if (lexer.getToken() == OR){
             lexer.advance();
             orexpr();
@@ -188,9 +178,7 @@ public class Program
 
     private static void andexpr() throws Exception
     {
-        System.out.println("in andexpr");
         notexpr();
-        //lexer.advance();
         if (lexer.getToken() == AND){
             lexer.advance();
             andexpr();
@@ -199,7 +187,6 @@ public class Program
 
     private static void notexpr() throws Exception
     {
-        System.out.println("in notexpr");
         if (lexer.getToken() == NOT){
             lexer.advance();
             notexpr();
@@ -274,8 +261,6 @@ public class Program
 
     private static void smallexpr() throws Exception
     {
-      System.out.println("in smallexpr");
-
       if (lexer.getToken() == NAME)
       {
         if (lexer.getNextToken() == 40)
@@ -298,7 +283,6 @@ public class Program
           }
         } else
         {
-            System.out.println("just NAME");
           lexer.advance();
         }
       } else if (1100 < lexer.getToken() && lexer.getToken() < 1108)
@@ -307,20 +291,16 @@ public class Program
         smallexpr();
       } else if (lexer.getToken() == LITERAL)
       {
-          System.out.println("LITERAL");
         lexer.advance();
       } else if (lexer.getToken() == 40)
       {
-          System.out.println("svigi opnast   (");
         lexer.advance();
         expr();
-        System.out.println("núna ætti svigi að lokast");
         if (lexer.getToken() == 41)
         {
           lexer.advance();
         } else
         {
-            System.out.println(")))))))");
           throw new Error(err(")"));
         }
       } else if (lexer.getToken() == IF)
@@ -349,8 +329,6 @@ public class Program
 
     private static void opname() throws Exception
     {
-      System.out.println("in opname");
-
       if (1100 < lexer.getToken() && lexer.getToken() < 1108)
       {
         lexer.advance();
@@ -363,17 +341,15 @@ public class Program
     // ifexpr = 'if', '(', expr, ')', body, elsepart;
     private static void ifexpr() throws Exception
     {
-        System.out.println("in ifexpr");
-
         lexer.advance();
         if (lexer.getToken() != 40)
-            throw new Error("(");
+            throw new Error(err("("));
         lexer.advance();
         // Búið er að lesa yfir if', '(',
 
         expr();
         if (lexer.getToken() != 41)
-            throw new Error(")");
+            throw new Error(err(")"));
         lexer.advance();
         // Búið er að lesa yfir 'if', '(', expr, ')',
 
@@ -388,8 +364,6 @@ public class Program
     //          ;
     private static void elsepart() throws Exception
     {
-        System.out.println("in elsepart");
-
         int tok = lexer.getToken();
         if (tok == ELSE)
         {
@@ -401,11 +375,11 @@ public class Program
         {
             lexer.advance();
             if (lexer.getToken() != 40)
-                throw new Error("(");
+                throw new Error(err("("));
             lexer.advance();
             expr();
             if (lexer.getToken() != 41)
-                throw new Error(")");
+                throw new Error(err(")"));
             lexer.advance();
             body();
             elsepart();
@@ -416,16 +390,14 @@ public class Program
     // body = '{', { expr, ';' }, '}';
     private static void body() throws Exception
     {
-        System.out.println("in body");
-
         if (lexer.getToken() != 123)
-            throw new Error("{");
+            throw new Error(err("{"));
         lexer.advance();
         while (lexer.getToken() != 125)
         {
             expr();
             if (lexer.getToken() != 59)
-                throw new Error(";");
+                throw new Error(err(";"));
             lexer.advance();
         }
         lexer.advance();
