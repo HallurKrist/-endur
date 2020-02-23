@@ -64,32 +64,25 @@ public static void main(String[] args) throws Exception
 {
         NanoLexer lexer = new NanoLexer(new FileReader(args[0]));
         lexer.init();
-        /*
-	NanoLexer lexer = new NanoLexer(new FileReader(args[0]));
-	int token = lexer.yylex();
-	while( token!=0 )
-	{
-		System.out.println(""+token+": \'"+lexeme+"\'");
-		token = lexer.yylex();
-	}
-        */
 }
 
 
 public void init() throws Exception
 {
-
+        
         t1 = yylex();
+        l1 = l2;
         t2 = yylex();
+        
 
 }     
   
 
 public void advance() throws Exception
 {
-
-        System.out.println("advancing from token: " + t1 + " (" + l1 + ") to " + t2 + " (" + l2 + ")");
+        // System.out.println("advancing from token: " + t1 + " (" + l1 + ") to " + t2 + " (" + l2 + ")");
         t1 = t2;
+        l1 = l2; //
         t2 = yylex();
         line1 = line2;
         line2 = yyline;
@@ -154,74 +147,66 @@ _OPNAME=([\+\-*/!%=><\:\^\~&|?])+
 
   /* Lesgreiningarreglur */
   /* Scanning rules */
-"&&" {
-        l1 = l2;
-        l2 = yytext();
-        return AND;
-}
 
-"||" {
-        l1 = l2;
+{_BOOLEAN} {
         l2 = yytext();
-        return OR;
-}
-
-"!" {
-        l1 = l2;
-        l2 = yytext();
-        return NOT;
+        int tok = ERROR;
+        switch(l2)
+        {
+            case "&&":
+                tok = AND;
+                break;
+            case "||":
+                tok = OR;
+                break;
+            case "!":
+                tok = NOT;
+                break;
+        }
+        return tok;
 }
 
 {_DELIM} {
-	l1 = l2;
         l2 = yytext();
 	return yycharat(0);
 }
 
 {_STRING} | {_FLOAT} | {_CHAR} | {_INT} | null | true | false {
-	l1 = l2;
         l2 = yytext();
 	return LITERAL;
 }
 
 "if" {
-	l1 = l2;
         l2 = yytext();
 	return IF;
 }
 
 "elsif" {
-        l1 = l2;
         l2 = yytext();
         return ELSIF;
 }
 
 "else" {
-        l1 = l2;
         l2 = yytext();
         return ELSE;
 }
 
 "var" {
-	l1 = l2;
         l2 = yytext();
 	return VAR;
 }
 
 "while" {
-        l1 = l2;
         l2 = yytext();
         return WHILE;
 }
 
 "return" {
-        l1 = l2;
         l2 = yytext();
         return RETURN;
 }
 
 {_OPNAME} {
-        l1 = l2;
         l2 = yytext();
         int token = -1;
         switch(l2.charAt(0))
@@ -252,7 +237,6 @@ _OPNAME=([\+\-*/!%=><\:\^\~&|?])+
 }
 
 {_NAME} {
-	l1 = l2;
         l2 = yytext();
 	return NAME;
 }
@@ -264,7 +248,6 @@ _OPNAME=([\+\-*/!%=><\:\^\~&|?])+
 }
 
 . {
-	l1 = l2;
         l2 = yytext();
 	return ERROR;
 }

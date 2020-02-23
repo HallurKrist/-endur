@@ -1,6 +1,8 @@
+// A parser for NanoMorpho based on EBNF in grammar2.txt and ifexpr.txt
+
 import java.io.FileReader;
 
-public class Program
+public class Parser
 {
 
     final static int ERROR = -1;
@@ -43,7 +45,7 @@ public class Program
         int line = lexer.getLine() + 1;
         int column = lexer.getColumn() + 1;
         String pos = "\nError in line " + line + ", column " + column;
-        String e = ".\nExpected " + tok + ". Next lexeme is \'" + lexer.getLexeme() + "\'";
+        String e = ".\nExpected " + tok + ". Next lexeme is \'" + lexer.getLexeme() + "\'.";
         return pos + e;
     }
 

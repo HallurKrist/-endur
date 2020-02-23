@@ -1,6 +1,6 @@
 function (variable1, variable2)
 {
-  var variable3, variable4;
+  ;;;var variable3, variable4;
   variable3 = (3 + 4);
   return variable4;
 }
@@ -13,7 +13,7 @@ f2 ()
   v2 = 6;
   v3 = function(v1,v2);
   v4 = v3+1;
-  if (v4 == 0) {
+  if (!(b1 && b2)) {
     return v4;
   }
   elsif (v4 == 1) {
@@ -21,6 +21,6 @@ f2 ()
   }
   else {
     return 1+1;
-  } + 2;
+  };
 
-}
+}a
