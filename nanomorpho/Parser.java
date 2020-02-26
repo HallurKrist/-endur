@@ -74,7 +74,7 @@ public class Parser
                 throw new Error(err("name"));
             }
             lexer.advance();
-            if (lexer.getToken() != 40) {
+            if (lexer.getToken() != '(') {
                 throw new Error(err("("));
             }
             // Svigi hefur opnast.
@@ -82,7 +82,7 @@ public class Parser
 
             if (lexer.getToken() == NAME) {
                 lexer.advance();
-                while (lexer.getToken() == 44) {
+                while (lexer.getToken() == ',') {
                     // 44 er ','
                     lexer.advance();
                     if (lexer.getToken() != NAME) {
@@ -92,13 +92,13 @@ public class Parser
                 }
             }
 
-            if (lexer.getToken() != 41) {
+            if (lexer.getToken() != ')') {
                 throw new Error(err(")"));
             }
             // Svigi hefur lokast og við á taka að "{".
             lexer.advance();
 
-            if (lexer.getToken() != 123) {
+            if (lexer.getToken() != '{') {
                 throw new Error(err("{"));
             }
             // Hornklofi hefur opnast.
@@ -106,7 +106,7 @@ public class Parser
 
             while (lexer.getToken() == VAR) {
                 decl();
-                if (lexer.getToken() != 59) {
+                if (lexer.getToken() != ';') {
                     throw new Error(err(";"));
                 }
                 lexer.advance();
@@ -114,14 +114,14 @@ public class Parser
             // Búið er að lesa {decl, ';'}
             // Næst ætti að koma {expr, ';'} , '}'
 
-            while (lexer.getToken() != 125) {
+            while (lexer.getToken() != '}') {
                 expr();
-                if (lexer.getToken() != 59)
+                if (lexer.getToken() != ';')
                     throw new Error(err(";"));
                 lexer.advance();
             }
 
-            if (lexer.getToken() != 125)
+            if (lexer.getToken() != '}')
                 throw new Error(err("}"));
             lexer.advance();
         }
@@ -139,7 +139,7 @@ public class Parser
             throw new Error(err("name"));
         }
         lexer.advance();
-        while (lexer.getToken() == 44) {
+        while (lexer.getToken() == ',') {
             // 44 er ','
             lexer.advance();
             if (lexer.getToken() != NAME) {
@@ -161,7 +161,7 @@ public class Parser
             expr();
             return;
         }
-        if (tok == NAME && lexer.getNextToken() == 61)
+        if (tok == NAME && lexer.getNextToken() == '=')
         {
             lexer.advance();
             lexer.advance();
@@ -283,18 +283,18 @@ public class Parser
     {
       if (lexer.getToken() == NAME)
       {
-        if (lexer.getNextToken() == 40)
+        if (lexer.getNextToken() == '(')
         {
           lexer.advance();
           lexer.advance();
-          if (lexer.getToken() != 41) {
+          if (lexer.getToken() != ')') {
             expr();
-            while (lexer.getToken() == 44) {
+            while (lexer.getToken() == ',') {
               lexer.advance();
               expr();
             }
           }
-          if (lexer.getToken() == 41)
+          if (lexer.getToken() == ')')
           {
             lexer.advance();
           } else
@@ -312,11 +312,11 @@ public class Parser
       } else if (lexer.getToken() == LITERAL)
       {
         lexer.advance();
-      } else if (lexer.getToken() == 40)
+      } else if (lexer.getToken() == '(')
       {
         lexer.advance();
         expr();
-        if (lexer.getToken() == 41)
+        if (lexer.getToken() == ')')
         {
           lexer.advance();
         } else
@@ -329,13 +329,13 @@ public class Parser
       } else if (lexer.getToken() == WHILE)
       {
         lexer.advance();
-        if (lexer.getToken() != 40)
+        if (lexer.getToken() != '(')
         {
           throw new Error(err("("));
         }
         lexer.advance();
         expr();
-        if (lexer.getToken() != 41)
+        if (lexer.getToken() != ')')
         {
           throw new Error(err(")"));
         }
@@ -369,13 +369,13 @@ public class Parser
     private static void ifexpr() throws Exception
     {
         lexer.advance();
-        if (lexer.getToken() != 40)
+        if (lexer.getToken() != '(')
             throw new Error(err("("));
         lexer.advance();
         // Búið er að lesa yfir if', '(',
 
         expr();
-        if (lexer.getToken() != 41)
+        if (lexer.getToken() != ')')
             throw new Error(err(")"));
         lexer.advance();
         // Búið er að lesa yfir 'if', '(', expr, ')',
@@ -401,11 +401,11 @@ public class Parser
         if (tok == ELSIF)
         {
             lexer.advance();
-            if (lexer.getToken() != 40)
+            if (lexer.getToken() != '(')
                 throw new Error(err("("));
             lexer.advance();
             expr();
-            if (lexer.getToken() != 41)
+            if (lexer.getToken() != ')')
                 throw new Error(err(")"));
             lexer.advance();
             body();
@@ -417,13 +417,13 @@ public class Parser
     // body = '{', { expr, ';' }, '}';
     private static void body() throws Exception
     {
-        if (lexer.getToken() != 123)
+        if (lexer.getToken() != '{')
             throw new Error(err("{"));
         lexer.advance();
-        while (lexer.getToken() != 125)
+        while (lexer.getToken() != '}')
         {
             expr();
-            if (lexer.getToken() != 59)
+            if (lexer.getToken() != ';')
                 throw new Error(err(";"));
             lexer.advance();
         }
