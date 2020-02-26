@@ -64,6 +64,8 @@ public class Parser
         }
     }
 
+    // function	= 	NAME, '(', [ NAME, { ',', NAME } ] ')'
+	// 			    '{', { decl, ';' }, { expr, ';' }, '}'
     private static void function()
     {
         try
@@ -169,6 +171,7 @@ public class Parser
         orexpr();
     }
 
+    // orexpr = andexpr, [ '||', orexpr ]
     private static void orexpr() throws Exception
     {
         andexpr();
@@ -178,6 +181,7 @@ public class Parser
         }
     }
 
+    // andexpr = notexpr, [ '||', andexpr]
     private static void andexpr() throws Exception
     {
         notexpr();
@@ -187,6 +191,7 @@ public class Parser
         }
     }
 
+    // notexpr = '!', notexpr | binopexpr1
     private static void notexpr() throws Exception
     {
         if (lexer.getToken() == NOT){
@@ -197,7 +202,7 @@ public class Parser
         binopexpr1();
     }
 
-
+    // binopexpr1 = binopexpr2, { OPNAME1 binopexpr2 }
     private static void binopexpr1() throws Exception
     {
         binopexpr2();
@@ -207,6 +212,7 @@ public class Parser
         }
     }
 
+    // binopexpr2 =	binopexpr3, [ OPNAME2, binopexpr2 ]
     private static void binopexpr2() throws Exception
     {
         binopexpr3();
@@ -216,6 +222,7 @@ public class Parser
         }
     }
 
+    // binopexpr3 =	binopexpr4, { OPNAME3, binopexpr4 }
     private static void binopexpr3() throws Exception
     {
         binopexpr4();
@@ -225,6 +232,7 @@ public class Parser
         }
     }
 
+    // binopexpr4 =	binopexpr5, { OPNAME4, binopexpr5 }
     private static void binopexpr4() throws Exception
     {
         binopexpr5();
@@ -234,6 +242,7 @@ public class Parser
         }
     }
 
+    // binopexpr5 =	binopexpr6, { OPNAME5, binopexpr6 }
     private static void binopexpr5() throws Exception
     {
         binopexpr6();
@@ -243,6 +252,7 @@ public class Parser
         }
     }
 
+    // binopexpr6 =	binopexpr7, { OPNAME6, binopexpr7 }
     private static void binopexpr6() throws Exception
     {
         binopexpr7();
@@ -252,6 +262,7 @@ public class Parser
         }
     }
 
+    // binopexpr7 =	smallexpr, { OPNAME7, smallexpr }
     private static void binopexpr7() throws Exception
     {
         smallexpr();
@@ -261,6 +272,13 @@ public class Parser
         }
     }
 
+    // smallexpr = NAME
+	// 		    |	NAME, '(', [ expr, { ',', expr } ], ')'
+	// 		    |	opname, smallexpr
+	// 		    | 	LITERAL 
+	// 		    |	'(', expr, ')'
+	// 		    |	ifexpr
+	// 		    |	'while', '(', expr, ')', body
     private static void smallexpr() throws Exception
     {
       if (lexer.getToken() == NAME)
@@ -329,6 +347,13 @@ public class Parser
       }
     }
 
+    // opname		=	OPNAME1
+	// 		        |	OPNAME2
+	// 		        |	OPNAME3
+	// 		        |	OPNAME4
+	// 		        |	OPNAME5
+	// 		        |	OPNAME6
+	// 		        |	OPNAME7
     private static void opname() throws Exception
     {
       if (1100 < lexer.getToken() && lexer.getToken() < 1108)

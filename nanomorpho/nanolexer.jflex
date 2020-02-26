@@ -80,6 +80,10 @@ public void init() throws Exception
 
 public void advance() throws Exception
 {
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
         // System.out.println("advancing from token: " + t1 + " (" + l1 + ") to " + t2 + " (" + l2 + ")");
         t1 = t2;
         l1 = l2; //

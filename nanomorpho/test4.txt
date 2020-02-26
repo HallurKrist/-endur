@@ -8,7 +8,7 @@ function (variable1, variable2)
 f2 ()
 {
   var v1, v2;
-  var v3, v3;
+  var v3, v3;;
   v1 = 5;
   v2 = 6;
   v3 = function(v1,v2);
