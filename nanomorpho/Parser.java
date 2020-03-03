@@ -1,6 +1,7 @@
 // A parser for NanoMorpho based on EBNF in grammar2.txt and ifexpr.txt
 
 import java.io.FileReader;
+import java.util.Vector;
 
 public class Parser
 {
@@ -34,9 +35,10 @@ public class Parser
     public static void main(final String[] args) throws Exception
     {
 
+        Object[] code = null;
         lexer = new NanoLexer(new FileReader(args[0])); //lesa inn skránna
         lexer.init(); // upphafstilla
-        parse(); // keyra parse-erinn
+        code = parse(); // keyra parse-erinn
 
     }
 
@@ -49,15 +51,18 @@ public class Parser
         return pos + e;
     }
 
-    public static void parse()
+    public static Object[] parse()
     {
+        Vector< Object[] > code = null;
+        
         try
         {
-            function();
+            code.add( function() );
             while (lexer.getToken() != 0)
             {
-                function();
+                code.add( function() );
             }
+            return code.toArray();
         } catch (Exception e)
         {
             e.printStackTrace();
