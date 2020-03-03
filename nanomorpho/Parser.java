@@ -1,10 +1,11 @@
 // A parser for NanoMorpho based on EBNF in grammar2.txt and ifexpr.txt
 
 import java.io.FileReader;
+import java.util.HashMap;
+import java.util.Vector;
 
 public class Parser
 {
-
     final static int ERROR = -1;
     final static int IF = 1001;
     final static int DEFINE = 1002;
@@ -33,11 +34,27 @@ public class Parser
 
     public static void main(final String[] args) throws Exception
     {
-
         lexer = new NanoLexer(new FileReader(args[0])); //lesa inn skránna
         lexer.init(); // upphafstilla
-        parse(); // keyra parse-erinn
+        varTable = new HashMap<String, Integer>();
+        Object[] program = parse(); // keyra parse-erinn
+        showProgram(program, 2);
+    }
 
+    public static void showProgram(Object[] tree, int indent)
+    {
+        for (Object obj : tree)
+        {
+            if (obj instanceof Object[])
+            {
+                Object[] o = (Object[]) obj;
+                //System.out.printf("%-" + indent + "s%s","", "[\n");
+                showProgram(o, indent+2);
+                //System.out.printf("%-" + indent + "s%s","", "]\n");
+            }
+            else
+                System.out.printf("%-" + indent + "s%s\n","", obj);
+        }
     }
 
     private static String err(String tok)
@@ -49,64 +66,95 @@ public class Parser
         return pos + e;
     }
 
-    public static void parse()
+    // The symbol table consists of the following two variables.
+    private static int varCount;
+    private static HashMap<String,Integer> varTable;
+
+    // Adds a new variable to the symbol table.
+    // Throws Error if the variable already exists.
+    private static void addVar( String name )
     {
+        if( varTable.get(name) != null )
+            throw new Error("Variable "+name+" already exists, near line "+lexer.getLine());
+        varTable.put(name,varCount++);
+    }
+
+    // Finds the location of an existing variable.
+    // Throws Error if the variable does not exist.
+    private static int findVar( String name )
+    {
+        Integer res = varTable.get(name);
+        if( res == null ) {
+            throw new Error("Variable "+name+" does not exist, near line "+lexer.getLine());
+        }
+        return res;
+    }
+
+    public static Object[] parse()
+
+    {
+        Vector<Object> program = new Vector<Object>();
         try
         {
-            function();
+            program.add(function());
             while (lexer.getToken() != 0)
             {
-                function();
+                program.add(function());
             }
         } catch (Exception e)
         {
             e.printStackTrace();
         }
+        return program.toArray();
     }
 
-    // function	= 	NAME, '(', [ NAME, { ',', NAME } ] ')'
-	// 			    '{', { decl, ';' }, { expr, ';' }, '}'
-    private static void function()
+    // EBNF: function = NAME, '(', [ NAME, { ',', NAME } ] ')'
+    //                             '{', { decl, ';' }, { expr, ';' }, '}';
+    // Returns: [name, argcount, varcount, exprs]
+    private static Object function()
     {
         try
         {
             if (lexer.getToken() != NAME) {
                 throw new Error(err("name"));
             }
+            //
+            String name = lexer.getLexeme();
             lexer.advance();
-            if (lexer.getToken() != 40) {
+            if (lexer.getToken() != '(') {
                 throw new Error(err("("));
             }
             // Svigi hefur opnast.
             lexer.advance();
 
+            int argCount = 0;
             if (lexer.getToken() == NAME) {
+                argCount++;
                 lexer.advance();
-                while (lexer.getToken() == 44) {
-                    // 44 er ','
+                while (lexer.getToken() == ',') {
                     lexer.advance();
-                    if (lexer.getToken() != NAME) {
+                    if (lexer.getToken() != NAME)
                         throw new Error(err("name"));
-                    }
+                    argCount++;
                     lexer.advance();
                 }
             }
 
-            if (lexer.getToken() != 41) {
+            if (lexer.getToken() != ')') {
                 throw new Error(err(")"));
             }
-            // Svigi hefur lokast og við á taka að "{".
+            // Svigi hefur lokast og við á að taka "{".
             lexer.advance();
 
-            if (lexer.getToken() != 123) {
+            if (lexer.getToken() != '{') {
                 throw new Error(err("{"));
             }
             // Hornklofi hefur opnast.
             lexer.advance();
-
+            int varCountBefore = varCount;
             while (lexer.getToken() == VAR) {
                 decl();
-                if (lexer.getToken() != 59) {
+                if (lexer.getToken() != ';') {
                     throw new Error(err(";"));
                 }
                 lexer.advance();
@@ -114,320 +162,370 @@ public class Parser
             // Búið er að lesa {decl, ';'}
             // Næst ætti að koma {expr, ';'} , '}'
 
-            while (lexer.getToken() != 125) {
-                expr();
-                if (lexer.getToken() != 59)
+            Vector<Object> expressions = new Vector<Object>();
+            while (lexer.getToken() != '}') {
+                expressions.add(expr());
+                if (lexer.getToken() != ';')
                     throw new Error(err(";"));
                 lexer.advance();
             }
 
-            if (lexer.getToken() != 125)
+            if (lexer.getToken() != '}')
                 throw new Error(err("}"));
             lexer.advance();
+
+            return new Object[]{name,
+                                argCount,
+                                varCount -varCountBefore,
+                                expressions.toArray()};
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
+        return null;
     }
 
-    // decl ='var', NAME, { ',', NAME }
+    // decl ='var', NAME, { ',', NAME };
     private static void decl() throws Exception
     {
         lexer.advance();
         if (lexer.getToken() != NAME) {
             throw new Error(err("name"));
         }
+        addVar(lexer.getLexeme());
         lexer.advance();
-        while (lexer.getToken() == 44) {
+        while (lexer.getToken() == ',') {
             // 44 er ','
             lexer.advance();
             if (lexer.getToken() != NAME) {
                 throw new Error(err("name"));
             }
+            addVar(lexer.getLexeme());
             lexer.advance();
         }
     }
 
-    // expr = 'return', expr
-    //      | NAME, '=', expr
-    //      | orexpr
-    private static void expr() throws Exception
+    // EBNF: expr = 'return', expr
+    //            | NAME, '=', expr
+    //            | orexpr;
+    // Returns: Object[] of valid expressions.
+    //          Return arrays corresponding to above EBNF are
+    //            ["RETURN", expr]
+    //            ["STORE", pos, expr]
+    //            orexpr()
+    //          where pos is the location of NAME in the symbol table
+    private static Object[] expr() throws Exception
     {
         int tok = lexer.getToken();
         if (tok == RETURN)
         {
+            Object[] ret  = new Object[2];
+            ret[0] = new String("RETURN");
             lexer.advance();
-            expr();
-            return;
+            ret[1] = expr();
+            return ret;
         }
-        if (tok == NAME && lexer.getNextToken() == 61)
+        if (tok == NAME && lexer.getNextToken() == '=')
         {
+            Object[] store = new Object[3];
+            store[0] = new String("STORE");
+            int pos = findVar(lexer.getLexeme());
+            store[1] = pos;
             lexer.advance();
             lexer.advance();
-            expr();
-            return;
+            store[2] = expr();
+            return store;
         }
-        orexpr();
+        return orexpr();
     }
 
-    // orexpr = andexpr, [ '||', orexpr ]
-    private static void orexpr() throws Exception
+    // EBNF: orexpr = andexpr, [ '||', orexpr ];
+    // Returns: andexpr()
+    //            or
+    //          ["OR", andexpr(), orexpr()]
+    private static Object[] orexpr() throws Exception
     {
-        andexpr();
+        Object[] and = andexpr();
         if (lexer.getToken() == OR){
+            Object[] or = new Object[3];
+            or[0] = new String("OR");
+            or[1] = and;
             lexer.advance();
-            orexpr();
+            or[2] = orexpr();
+            return or;
         }
+        return and;
     }
 
-    // andexpr = notexpr, [ '||', andexpr]
-    private static void andexpr() throws Exception
+    // EBNF: andexpr = notexpr, [ '&&', andexpr ];
+    // Returns: notexpr()
+    //            or
+    //          ["AND", notexpr(), andexpr()]
+    private static Object[] andexpr() throws Exception
     {
-        notexpr();
+        Object[] not = notexpr();
         if (lexer.getToken() == AND){
+            //Object[] and = new Object[3];
+            //and[0] = new String("AND");
+            //and[1] = not;
             lexer.advance();
-            andexpr();
+            //and[2] = andexpr();
+            // return and;
+            return new Object[]{"AND", not, andexpr()};
         }
+        return not;
     }
 
-    // notexpr = '!', notexpr | binopexpr1
-    private static void notexpr() throws Exception
+    // EBNF: notexpr = '!', notexpr | binopexpr1;
+    // Returns: ["NOT", notexpr()]
+    //            or
+    //          binopexpr()
+    private static Object[] notexpr() throws Exception
     {
         if (lexer.getToken() == NOT){
+            Object[] not = new Object[2];
+            not[0] = new String("NOT");
             lexer.advance();
-            notexpr();
-            return;
+            not[1] = notexpr();
+            return not;
         }
-        binopexpr1();
+        return binopexpr(1);
     }
 
-    // binopexpr1 = binopexpr2, { OPNAME1 binopexpr2 }
-    private static void binopexpr1() throws Exception
+    // Usage: Object[] code = binopexpr(k);
+    // Pre:   The lexer is positioned at the beginning
+    //        of a binopexpr with priority k.
+    //        1 <= k <= 8.
+    //        Note that a binopexpr with priority 8 is
+    //        considered to be a smallexpr.
+    // Post:  The compiler has advanced over the
+    //        binopexpr with priority k and code now
+    //        contains the intermediate code for that
+    //        expression.
+    // Note:  If an error occurs we may either write
+    //        an error message and stop the program or
+    //        we might throw an Error("...") and let
+    //        the catcher of the Error write the error
+    //        message.
+    public static Object[] binopexpr( int k ) throws Exception
     {
-        binopexpr2();
-        while(lexer.getToken() == OP1){
-            lexer.advance();
-            binopexpr2();
-        }
-    }
+        if( k == 8 ) return smallexpr();
 
-    // binopexpr2 =	binopexpr3, [ OPNAME2, binopexpr2 ]
-    private static void binopexpr2() throws Exception
-    {
-        binopexpr3();
-        if(lexer.getToken() == OP2){
-            lexer.advance();
-            binopexpr2();
-        }
-    }
+        Object[] res = binopexpr(k+1);
 
-    // binopexpr3 =	binopexpr4, { OPNAME3, binopexpr4 }
-    private static void binopexpr3() throws Exception
-    {
-        binopexpr4();
-        while(lexer.getToken() == OP3){
-            lexer.advance();
-            binopexpr4();
-        }
-    }
-
-    // binopexpr4 =	binopexpr5, { OPNAME4, binopexpr5 }
-    private static void binopexpr4() throws Exception
-    {
-        binopexpr5();
-        while(lexer.getToken() == OP4){
-            lexer.advance();
-            binopexpr5();
-        }
-    }
-
-    // binopexpr5 =	binopexpr6, { OPNAME5, binopexpr6 }
-    private static void binopexpr5() throws Exception
-    {
-        binopexpr6();
-        while(lexer.getToken() == OP5){
-            lexer.advance();
-            binopexpr6();
-        }
-    }
-
-    // binopexpr6 =	binopexpr7, { OPNAME6, binopexpr7 }
-    private static void binopexpr6() throws Exception
-    {
-        binopexpr7();
-        while(lexer.getToken() == OP6){
-            lexer.advance();
-            binopexpr7();
-        }
-    }
-
-    // binopexpr7 =	smallexpr, { OPNAME7, smallexpr }
-    private static void binopexpr7() throws Exception
-    {
-        smallexpr();
-        while(lexer.getToken() == OP7){
-            lexer.advance();
-            smallexpr();
-        }
-    }
-
-    // smallexpr = NAME
-	// 		    |	NAME, '(', [ expr, { ',', expr } ], ')'
-	// 		    |	opname, smallexpr
-	// 		    | 	LITERAL 
-	// 		    |	'(', expr, ')'
-	// 		    |	ifexpr
-	// 		    |	'while', '(', expr, ')', body
-    private static void smallexpr() throws Exception
-    {
-      if (lexer.getToken() == NAME)
-      {
-        if (lexer.getNextToken() == 40)
+        // Handle right associative binary operators
+        if( k == 2 )
         {
-          lexer.advance();
-          lexer.advance();
-          if (lexer.getToken() != 41) {
-            expr();
-            while (lexer.getToken() == 44) {
-              lexer.advance();
-              expr();
+            if( !isOp(lexer.getToken(),k) ) return res;
+            String name = lexer.getLexeme();
+            lexer.advance();
+            Object[] right = binopexpr(k);
+            return new Object[]{"CALL",name,new Object[]{res,right}};
+        }
+
+        // Handle left associative binary operators
+        while( isOp(lexer.getToken(),k) )
+        {
+            String name = lexer.getLexeme();
+            lexer.advance();
+            Object[] right = binopexpr(k+1);
+            res = new Object[]{"CALL",name,new Object[]{res,right}};
+        }
+        return res;
+    }
+
+    // Usage: boolean b = isOp(tok,k);
+    // Pre:   tok is a token, 1<=k<=7.
+    // Post:  b is true if and only if tok
+    //        is a token which can be a
+    //        binary operation of priority
+    //        k.
+    public static boolean isOp( int tok, int k )
+    {
+        switch( tok )
+        {
+        case OP1: return k==1;
+        case OP2: return k==2;
+        case OP3: return k==3;
+        case OP4: return k==4;
+        case OP5: return k==5;
+        case OP6: return k==6;
+        case OP7: return k==7;
+        default:  return false;
+        }
+    }
+
+    // EBNF: smallexpr = NAME
+    //                 | NAME, '(', [ expr, { ',', expr } ], ')'
+    //                 | opname, smallexpr
+    //                 | LITERAL
+    //                 | '(', expr, ')'
+    //                 | ifexpr
+    //                 | 'while', '(', expr, ')', body;
+    // Returns: ["CALL", name, [expr(), expr(), ..., expr()]]
+    //          [FETCH, pos]
+    //          [TODO]
+    //          ["LITERAL", literal]
+    //          expr()
+    //          ifexpr()
+    //          ["WHILE", expr(), body()]
+    private static Object[] smallexpr() throws Exception
+    {
+        if (lexer.getToken() == NAME && lexer.getNextToken() == '(')
+        {
+            String name = lexer.getLexeme();
+            lexer.advance();
+            lexer.advance();
+            Vector<Object> expressions = new Vector<Object>();
+            if (lexer.getToken() != ')') {
+                expressions.add(expr());
+                while (lexer.getToken() == ',') {
+                    lexer.advance();
+                    expressions.add(expr());
+                }
             }
-          }
-          if (lexer.getToken() == 41)
-          {
+            if (lexer.getToken() != ')')
+                throw new Error(err(")"));
             lexer.advance();
-          } else
-          {
-            throw new Error(err(")"));
-          }
-        } else
-        {
-          lexer.advance();
+            return new Object[] {"CALL", name, expressions.toArray()};
         }
-      } else if (1100 < lexer.getToken() && lexer.getToken() < 1108)
-      {
-        opname();
-        smallexpr();
-      } else if (lexer.getToken() == LITERAL)
-      {
-        lexer.advance();
-      } else if (lexer.getToken() == 40)
-      {
-        lexer.advance();
-        expr();
-        if (lexer.getToken() == 41)
+
+        if (lexer.getToken() == NAME)
         {
-          lexer.advance();
-        } else
-        {
-          throw new Error(err(")"));
+            String name = lexer.getLexeme();
+            lexer.advance();
+            return new Object[]{"FETCH", findVar(name)};
         }
-      } else if (lexer.getToken() == IF)
-      {
-        ifexpr();
-      } else if (lexer.getToken() == WHILE)
-      {
-        lexer.advance();
-        if (lexer.getToken() != 40)
+
+        if  (1100 < lexer.getToken() && lexer.getToken() < 1108)
         {
-          throw new Error(err("("));
+            // TODO handle operators
+            opname();
+            smallexpr();
+            return null;
         }
-        lexer.advance();
-        expr();
-        if (lexer.getToken() != 41)
+
+        if (lexer.getToken() == LITERAL)
         {
-          throw new Error(err(")"));
+            String literal = lexer.getLexeme();
+            lexer.advance();
+            return new Object[]{"LITERAL", literal};
         }
-        lexer.advance();
-        body();
-      } else
-      {
+
+        if (lexer.getToken() == '(')
+        {
+            lexer.advance();
+            Object[] expression = expr();
+            if (lexer.getToken() != ')')
+                throw new Error(err(")"));
+            lexer.advance();
+            return expression;
+        }
+
+        if (lexer.getToken() == IF)
+        {
+            return ifexpr();
+        }
+
+        if (lexer.getToken() == WHILE)
+        {
+            lexer.advance();
+            if (lexer.getToken() != '(')
+                throw new Error(err("("));
+            lexer.advance();
+            Object[] expression = expr();
+            if (lexer.getToken() != ')')
+                throw new Error(err(")"));
+            lexer.advance();
+            return new Object[]{"WHILE", expression, body()};
+        }
+
         throw new Error(err("smallexpr"));
-      }
     }
 
-    // opname		=	OPNAME1
-	// 		        |	OPNAME2
-	// 		        |	OPNAME3
-	// 		        |	OPNAME4
-	// 		        |	OPNAME5
-	// 		        |	OPNAME6
-	// 		        |	OPNAME7
+    // TODO: handle operators in smallexpr and delete function
     private static void opname() throws Exception
     {
-      if (1100 < lexer.getToken() && lexer.getToken() < 1108)
-      {
-        lexer.advance();
-      } else
-      {
-          err("operator");
-      }
+        if (1100 < lexer.getToken() && lexer.getToken() < 1108)
+        {
+            lexer.advance();
+        } else
+        {
+            err("operator");
+        }
     }
 
-    // ifexpr = 'if', '(', expr, ')', body, elsepart;
-    private static void ifexpr() throws Exception
+    // EBNF: ifexpr = 'if', '(', expr, ')', body, elsepart;
+    // Returns: ["IF", expr(), body(), elsepart()]
+    private static Object[] ifexpr() throws Exception
     {
         lexer.advance();
-        if (lexer.getToken() != 40)
+        if (lexer.getToken() != '(')
             throw new Error(err("("));
         lexer.advance();
         // Búið er að lesa yfir if', '(',
 
-        expr();
-        if (lexer.getToken() != 41)
+        Object[] condition = expr();
+        if (lexer.getToken() != ')')
             throw new Error(err(")"));
         lexer.advance();
         // Búið er að lesa yfir 'if', '(', expr, ')',
 
-        body();
-        elsepart();
-        // Búið er að lesa yfir 'if', '(', expr, ')', body, elsepart;
+        return new Object[]{"IF", condition, body(), elsepart()};
     }
 
-    // elsepart = /* nothing */
-    //          | 'else', body
-    //          | 'elsif', '(', expr, ')', body, elsepart
-    //          ;
-    private static void elsepart() throws Exception
+    // EBNF: elsepart = /* nothing */
+    //               | 'else', body
+    //               | 'elsif', '(', expr, ')', body, elsepart;
+    // Returns:     body()
+    //          or  ["IF", expr(), body(), elsepart()]
+    //          or  null
+    private static Object[] elsepart() throws Exception
     {
         int tok = lexer.getToken();
         if (tok == ELSE)
         {
             lexer.advance();
-            body();
-            return;
+            return body();
         }
         if (tok == ELSIF)
         {
             lexer.advance();
-            if (lexer.getToken() != 40)
+            if (lexer.getToken() != '(')
                 throw new Error(err("("));
             lexer.advance();
-            expr();
-            if (lexer.getToken() != 41)
+            Object[] condition =expr();
+            if (lexer.getToken() != ')')
                 throw new Error(err(")"));
             lexer.advance();
-            body();
-            elsepart();
+            return new Object[]{"IF", condition, body(), elsepart()};
         }
-        // if tok is neither ELSE nor ELSEIF, do nothing.
+
+        // tok is neither ELSE nor ELSIF
+        return null;
     }
 
     // body = '{', { expr, ';' }, '}';
-    private static void body() throws Exception
+    private static Object[] body() throws Exception
     {
-        if (lexer.getToken() != 123)
+        if (lexer.getToken() != '{')
             throw new Error(err("{"));
         lexer.advance();
-        while (lexer.getToken() != 125)
+        if (lexer.getToken() == '}')
         {
-            expr();
-            if (lexer.getToken() != 59)
+            lexer.advance();
+            return null;
+        }
+        Vector<Object> expressions = new Vector<Object>();
+        while (lexer.getToken() != '}')
+        {
+            expressions.add(expr());
+            if (lexer.getToken() != ';')
                 throw new Error(err(";"));
             lexer.advance();
         }
         lexer.advance();
+        return expressions.toArray();
     }
-
 }
