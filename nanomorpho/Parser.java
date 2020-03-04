@@ -36,7 +36,6 @@ public class Parser
     {
         lexer = new NanoLexer(new FileReader(args[0])); //lesa inn skránna
         lexer.init(); // upphafstilla
-        varTable = new HashMap<String, Integer>();
         Object[] program = parse(); // keyra parse-erinn
         showProgram(program, 2);
     }
@@ -48,9 +47,9 @@ public class Parser
             if (obj instanceof Object[])
             {
                 Object[] o = (Object[]) obj;
-                //System.out.printf("%-" + indent + "s%s","", "[\n");
+                System.out.printf("%-" + indent + "s%s","", "[\n");
                 showProgram(o, indent+2);
-                //System.out.printf("%-" + indent + "s%s","", "]\n");
+                System.out.printf("%-" + indent + "s%s","", "]\n");
             }
             else
                 System.out.printf("%-" + indent + "s%s\n","", obj);
@@ -96,9 +95,12 @@ public class Parser
         Vector<Object> program = new Vector<Object>();
         try
         {
+            varTable = new HashMap<String, Integer>();
             program.add(function());
             while (lexer.getToken() != 0)
             {
+                varTable = new HashMap<String, Integer>();
+                varCount = 0;
                 program.add(function());
             }
         } catch (Exception e)
@@ -129,12 +131,14 @@ public class Parser
 
             int argCount = 0;
             if (lexer.getToken() == NAME) {
+                addVar(lexer.getLexeme());
                 argCount++;
                 lexer.advance();
                 while (lexer.getToken() == ',') {
                     lexer.advance();
                     if (lexer.getToken() != NAME)
                         throw new Error(err("name"));
+                    addVar(lexer.getLexeme());
                     argCount++;
                     lexer.advance();
                 }
@@ -284,11 +288,12 @@ public class Parser
     private static Object[] notexpr() throws Exception
     {
         if (lexer.getToken() == NOT){
-            Object[] not = new Object[2];
-            not[0] = new String("NOT");
+            //Object[] not = new Object[2];
+            //not[0] = new String("NOT");
             lexer.advance();
-            not[1] = notexpr();
-            return not;
+            //not[1] = notexpr();
+            //return not;
+            return new Object[]{"NOT", notexpr()};
         }
         return binopexpr(1);
     }
@@ -401,9 +406,11 @@ public class Parser
         if  (1100 < lexer.getToken() && lexer.getToken() < 1108)
         {
             // TODO handle operators
-            opname();
-            smallexpr();
-            return null;
+            //opname();
+            //smallexpr();
+            String op = lexer.getLexeme();
+            lexer.advance();
+            return new Object[]{"CALL", op, smallexpr()};
         }
 
         if (lexer.getToken() == LITERAL)
@@ -526,6 +533,6 @@ public class Parser
             lexer.advance();
         }
         lexer.advance();
-        return expressions.toArray();
+        return new Object[]{"BODY", expressions.toArray()};
     }
 }
