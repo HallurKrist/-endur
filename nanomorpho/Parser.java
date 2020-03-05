@@ -38,6 +38,7 @@ public class Parser
         lexer.init(); // upphafstilla
         Object[] program = parse(); // keyra parse-erinn
         showProgram(program, 2);
+        generateProgram(args[0], program);
     }
 
     public static void showProgram(Object[] tree, int indent)
@@ -535,4 +536,191 @@ public class Parser
         lexer.advance();
         return new Object[]{"BODY", expressions.toArray()};
     }
+
+
+
+    static void generateProgram( String filename, Object[] funs )
+    {
+        String programname = filename.substring(0,filename.indexOf('.'));
+        System.out.println("\""+programname+".mexe\" = main in");
+        System.out.println("!");
+        System.out.println("{{");
+        for( Object f: funs )
+        {
+            generateFunction((Object[])f);
+        }
+        System.out.println("}}");
+        System.out.println("*");
+        System.out.println("BASIS;");
+    }
+
+    static void generateFunction( Object[] fun )
+    {
+        // function = [name,argcount,varcount,exprs]
+        System.out.println("#\"" + fun[0] + "[f" + fun[1] + "]\" =");
+        System.out.println("[");
+        int varcount = (int) fun[2];
+        if (varcount > 0)
+        {
+            instr("MakeVal", "null");
+            P();
+            for (int k=1; k<varcount; k++)
+                instr("MakeValP", "null");
+        }
+        // TODO what about an empty function??? then f[3] is null?
+        generateExpr((Object[])fun[3]);
+        System.out.println("];");
+    }
+
+    // All existing labels, i.e. labels the generated
+    // code that we have already produced, should be
+    // of form
+    //    _xxxx
+    // where xxxx corresponds to an integer n
+    // such that 0 <= n < nextLab.
+    // So we should update nextLab as we generate
+    // new labels.
+    // The first generated label would be _0, the
+    // next would be _1, and so on.
+    private static int nextLab = 0;
+
+    // Returns a new, previously unused, label.
+    // Useful for control-flow expressions.
+    static String newLabel()
+    {
+        return "_"+(nextLab++);
+    }
+
+    // P er " " ef yfriskrifa má ac á gildahlaða, annars " P"
+    private static String P = " ";
+
+    // Skilar P og uppfærir í "P "
+    private static String P()
+    {
+        String oldP = P;
+        P = "P ";
+        return oldP;
+    }
+
+    private static void Poff()
+    {
+        P = " ";
+    }
+
+    static void generateExpr( Object[] e )
+    {
+        if (e[0] instanceof String) {
+            asExpr(e);
+            return;
+        }
+
+        for (Object expr : e)
+        {
+            generateExpr((Object[]) expr);
+
+        }
+        // e =
+    }
+
+    static void instr(String instruction, String arg)
+    {
+        System.out.println("(" + instruction + " " + arg + ")");
+    }
+
+    static void asExpr(Object[] e)
+    {
+        String s = (String) e[0];
+        switch(s)
+        {
+        case "RETURN" :
+            // ["RETURN",expr]
+            generateExpr((Object[]) e[1]);
+            System.out.println("(Return)");
+            break;
+        case "STORE":
+            // ["STORE",pos,expr]
+            generateExpr((Object[]) e[2]);
+            System.out.println("(Store " + e[1] + ")");
+            Poff();
+            break;
+        case "OR":
+            // ["OR",expr,expr]
+            generateExpr((Object[]) e[1]);
+            String labTrue = newLabel();
+            System.out.println("(GoTrue " + labTrue + ")");
+            generateExpr((Object[]) e[2]);
+            System.out.println(labTrue + ":");
+            break;
+        case "AND":
+            // ["AND",expr,expr]
+            generateExpr((Object[]) e[1]);
+            String labFalse = newLabel();
+            instr("GoFalse", labFalse);
+            generateExpr((Object[]) e[2]);
+            System.out.println(labFalse + ":");
+            break;
+        case "NOT":
+            // ["NOT",expr]
+            generateExpr((Object[]) e[1]);
+            System.out.println("(NOT)");
+            break;
+        case "CALL":
+            // ["CALL",name,args]
+            Object[] argsArr = (Object[]) e[2];
+            if (argsArr[0] instanceof String)
+            {
+                asExpr((Object[]) e[2]);
+                System.out.println("(Call #\"" + e[1] + "[f1]\" 1)");
+            }
+            else
+            {
+                int nargs = argsArr.length;
+                for (Object arg : argsArr)
+                    generateExpr((Object[]) arg);
+                System.out.println("(Call #\"" + e[1] + "[f" + nargs + "]\" " + nargs + ")");
+            }
+            break;
+        case "FETCH":
+            System.out.println("(Fetch" + P() + (int)e[1] + ")");
+            break;
+        case "LITERAL":
+            // ["LITERAL",string]
+            instr("MakeVal" + P(), (String) e[1]);
+            break;
+        case "IF":
+            // ["IF",cond,expr,elsepar]
+            generateExpr((Object[]) e[1]);
+            String labElse = newLabel();
+            instr("GoFalse", labElse);
+            generateExpr((Object[]) e[2]);
+            String labCont = newLabel();
+            instr("Go", labCont);
+            System.out.println(labElse + ":");
+            generateExpr((Object[]) e[3]);
+            System.out.println(labCont + ":");
+            break;
+        case "WHILE":
+            // ["WHILE",cond,expr]
+            String labCond = newLabel();
+            System.out.println(labCond + ":");
+            generateExpr((Object[]) e[1]);
+            String labDone = newLabel();
+            instr("GoFalse", labDone);
+            generateExpr((Object[]) e[2]);
+            System.out.println(labDone + ":");
+            break;
+        case "BODY":
+            // ["BODY",exprs]
+            generateExpr((Object[]) e[1]);
+            break;
+        }
+    }
+
+    /*
+    static void generateBody( Object[] bod )
+    {
+        for (Object expr : bod)
+            generateExpr(expr);
+    }
+    */
 }
