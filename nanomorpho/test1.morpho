@@ -1,0 +1,11 @@
+" test .mmod" = main in
+!
+{{
+  f =
+  fun(x)
+  {
+    x+2;
+  };
+}}
+*
+BASIS;

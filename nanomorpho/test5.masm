@@ -1,0 +1,68 @@
+  [
+    main
+    0
+    0
+    [
+      [
+        CALL
+        writeln
+        [
+          [
+            CALL
+            fun
+            [
+              [
+                LITERAL
+                3
+              ]
+            ]
+          ]
+        ]
+      ]
+    ]
+  ]
+  [
+    fun
+    1
+    0
+    [
+      [
+        RETURN
+        [
+          CALL
+          +
+          [
+            [
+              FETCH
+              0
+            ]
+            [
+              LITERAL
+              2
+            ]
+          ]
+        ]
+      ]
+    ]
+  ]
+"test5.mexe" = main in
+!
+{{
+#"main[f0]" =
+[
+(MakeVal  3)
+(Call #"fun[f1]" 1)
+(Call #"writeln[f1]" 1)
+(Return)
+];
+#"fun[f1]" =
+[
+(FetchP 0)
+(MakeValP  2)
+(Call #"+[f2]" 2)
+(Return)
+(Return)
+];
+}}
+*
+BASIS;

@@ -1,0 +1,78 @@
+"test3.mexe" = main in
+!
+{{
+#"f1[f1]" =
+[
+(MakeVal null)
+(MakeValP  1)
+(Store 1)
+(MakeVal  2)
+(MakeValP  3)
+(Call #"*[f2]" 2)
+(MakeValP  2)
+(MakeValP  1)
+(Call #"/[f2]" 2)
+(FetchP 1)
+(Call #"*[f2]" 2)
+(Call #"+[f2]" 2)
+(Return)
+];
+#"f2[f3]" =
+[
+(MakeVal null)
+(MakeValP null)
+(MakeValP  1)
+(Store 3)
+(Fetch 3)
+(MakeValP  1)
+(Call #"<[f2]" 2)
+(Call #"![f1]" 1)
+(GoFalse _0)
+(FetchP 3)
+(Call #"f1[f1]" 1)
+(Return)
+(Go _1)
+_0:
+(FetchP 3)
+(MakeValP  1)
+(Call #"==[f2]" 2)
+(FetchP 3)
+(MakeValP  2)
+(Call #"==[f2]" 2)
+(Call #"||[f2]" 2)
+(GoFalse _2)
+(FetchP 0)
+(Return)
+(Go _3)
+_2:
+(FetchP 3)
+(MakeValP  2)
+(Call #"==[f2]" 2)
+(GoFalse _4)
+(MakeValP  1)
+(MakeValP  2)
+(MakeValP  3)
+(MakeValP  4)
+(Call #":[f2]" 2)
+(Call #":[f2]" 2)
+(Call #":[f2]" 2)
+(Return)
+(Go _5)
+_4:
+(MakeValP  1)
+(MakeValP  2)
+(Call #"*[f2]" 2)
+(MakeValP  3)
+(Call #"*[f2]" 2)
+(MakeValP  4)
+(MakeValP  5)
+(Call #"*[f2]" 2)
+(Call #"+[f2]" 2)
+(Return)
+_5:
+_3:
+_1:
+];
+}}
+*
+BASIS;

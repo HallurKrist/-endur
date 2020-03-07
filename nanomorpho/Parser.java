@@ -569,6 +569,9 @@ public class Parser
         }
         // TODO what about an empty function??? then f[3] is null?
         generateExpr((Object[])fun[3]);
+
+        System.out.println("(Return)");
+
         System.out.println("];");
     }
 

@@ -1,0 +1,10 @@
+
+main()
+{
+  writeln(fun(3));
+}
+fun(x)
+{
+return x+2;
+}
+
