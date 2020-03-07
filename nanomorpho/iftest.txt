@@ -5,6 +5,7 @@ main()
 
 iftest(x)
 {
+  ;;; ekki hægt að hafa engin viðföng
   ;;;var x;
   ;;;x = 1;
   if ( x == 1 )

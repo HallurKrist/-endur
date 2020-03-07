@@ -1,0 +1,65 @@
+main()
+{
+  optest(1); ;;; ekki hægt að hafa föll með engin viðföng
+}
+
+optest(x)
+{
+  var y;
+
+  writeln("á að vera 2");
+  writeln(1+1);
+
+  writeln("á að vera 0");
+  writeln(1-1);
+
+  writeln("á að vera 1");
+  writeln(1*1);
+
+  writeln("á að vera 1");
+  writeln(2/2);
+
+  writeln("á að vera 0");
+  writeln(2%2);
+
+  writeln("á að vera virkar");
+  if (1 < 2)
+  {
+    writeln("virkar");
+  };
+  
+  writeln("á að vera virkar");
+  if (2 > 1)
+  {
+    writeln("virkar");
+  };
+  
+  writeln("á að vera virkar");
+  if (1 != 2)
+  {
+    writeln("virkar");
+  };
+
+  writeln("á að vera 1");
+  x = 1;
+  writeln(x);
+
+  writeln("á að vera virkar");
+  if (1 == 1 && 2 != 1)
+  {
+    writeln("virkar");
+  };
+
+  writeln("á að vera virkar");
+  if (1 == 2 || 2 != 1)
+  {
+    writeln("virkar");
+  };
+
+  writeln("á að vera [1,2]");
+  y = 1:2;
+  writeln(y);
+
+  writeln("ekki viss hvernig a ad tjekka a ?, ~ og ^");
+
+}

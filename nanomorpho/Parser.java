@@ -37,7 +37,7 @@ public class Parser
         lexer = new NanoLexer(new FileReader(args[0])); //lesa inn skránna
         lexer.init(); // upphafstilla
         Object[] program = parse(); // keyra parse-erinn
-        showProgram(program, 2);
+        // showProgram(program, 2);
         generateProgram(args[0], program);
     }
 
@@ -558,7 +558,10 @@ public class Parser
     static void generateFunction( Object[] fun )
     {
         // function = [name,argcount,varcount,exprs]
+        
         System.out.println("#\"" + fun[0] + "[f" + fun[1] + "]\" =");
+        
+        
         System.out.println("[");
         int varcount = (int) fun[2];
         if (varcount > 0)
@@ -714,6 +717,7 @@ public class Parser
             String labDone = newLabel();
             instr("GoFalse", labDone);
             generateExpr((Object[]) e[2]);
+            instr("Go", labCond);
             System.out.println(labDone + ":");
             break;
         case "BODY":

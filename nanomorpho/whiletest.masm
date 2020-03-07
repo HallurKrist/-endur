@@ -1,0 +1,31 @@
+"whiletest.mexe" = main in
+!
+{{
+#"main[f0]" =
+[
+(MakeVal  1)
+(Call #"whiletest[f1]" 1)
+(Return)
+];
+#"whiletest[f1]" =
+[
+_0:
+(FetchP 0)
+(MakeValP  10)
+(Call #"<[f2]" 2)
+(GoFalse _1)
+(FetchP 0)
+(Call #"writeln[f1]" 1)
+(FetchP 0)
+(MakeValP  1)
+(Call #"+[f2]" 2)
+(Store 0)
+(Go _0)
+_1:
+(Fetch 0)
+(Call #"writeln[f1]" 1)
+(Return)
+];
+}}
+*
+BASIS;

@@ -1,0 +1,14 @@
+main()
+{
+  whiletest(1); ;;; ekki hægt að hafa engin viðföng
+}
+
+whiletest(x)
+{
+  while ( x < 10 )
+  {
+    writeln(x);
+    x = x + 1;
+  };
+  writeln(x);
+}
