@@ -1,13 +1,5 @@
 /**
-	JFlex scanner example based on a scanner for NanoLisp.
-	Author: Snorri Agnarsson, 2017-2020
-
-	This stand-alone scanner/lexical analyzer can be built and run using:
-		java -jar JFlex-full-1.7.0.jar nanolexer.jflex
-		javac NanoLexer.java
-		java NanoLexer inputfile > outputfile
-	Also, the program 'make' can be used with the proper 'makefile':
-		make test
+	JFlex scanner for NanoMorpho based on a scanner for NanoLisp.
  */
 
 import java.io.*;
@@ -53,7 +45,7 @@ final static int OP7 = 1107;
 
 // A variable that will contain lexemes as they are recognized:
 private static String lexeme;
-private static int t1, t2 = 0;              // t1 = current token, t2 = next token
+private static int t1, t2 = 0;
 private static String l1, l2 = "";
 private static int line1, line2 = 0;
 private static int column1, column2 =0;
@@ -69,22 +61,14 @@ public static void main(String[] args) throws Exception
 
 public void init() throws Exception
 {
-        
         t1 = yylex();
         l1 = l2;
         t2 = yylex();
-        
-
 }     
   
 
 public void advance() throws Exception
 {
-<<<<<<< HEAD
-=======
-
->>>>>>> master
-        // System.out.println("advancing from token: " + t1 + " (" + l1 + ") to " + t2 + " (" + l2 + ")");
         t1 = t2;
         l1 = l2; //
         t2 = yylex();
@@ -96,8 +80,6 @@ public void advance() throws Exception
                 l1 = l2;
                 l2 = yytext();    
         }
-       
-
 }
 
 public int getToken()
@@ -144,7 +126,7 @@ _STRING=\"([^\"\\]|\\b|\\t|\\n|\\f|\\r|\\\"|\\\'|\\\\|(\\[0-3][0-7][0-7])|\\[0-7
 _CHAR=\'([^\'\\]|\\b|\\t|\\n|\\f|\\r|\\\"|\\\'|\\\\|(\\[0-3][0-7][0-7])|(\\[0-7][0-7])|(\\[0-7]))\'
 _DELIM=[(){},;=]
 _NAME=([:letter:]|{_DIGIT}|[_])+
-_BOOLEAN=['!'|'&&'|'||']
+_BOOLEAN="!"|"&&"|"||"
 _OPNAME=([\+\-*/!%=><\:\^\~&|?])+
 
 %%
@@ -172,17 +154,17 @@ _OPNAME=([\+\-*/!%=><\:\^\~&|?])+
 
 {_DELIM} {
         l2 = yytext();
-	return yycharat(0);
+        return yycharat(0);
 }
 
 {_STRING} | {_FLOAT} | {_CHAR} | {_INT} | null | true | false {
         l2 = yytext();
-	return LITERAL;
+        return LITERAL;
 }
 
 "if" {
         l2 = yytext();
-	return IF;
+        return IF;
 }
 
 "elsif" {
@@ -197,7 +179,7 @@ _OPNAME=([\+\-*/!%=><\:\^\~&|?])+
 
 "var" {
         l2 = yytext();
-	return VAR;
+        return VAR;
 }
 
 "while" {
