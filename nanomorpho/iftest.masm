@@ -1,0 +1,96 @@
+
+"iftest.mexe" = main in
+!
+{{
+#"main[f0]" =
+[
+(MakeVal  1)
+(Call #"iftest[f1]" 1)
+(Return)
+];
+#"iftest[f1]" =
+[
+(FetchP 0)
+(MakeValP  1)
+(Call #"==[f2]" 2)
+(GoFalse _0)
+(MakeValP  "first if in test - ")
+(Call #"writeln[f1]" 1)
+(Go _1)
+_0:
+(FetchP 0)
+(MakeValP  1)
+(Call #"!=[f2]" 2)
+(GoFalse _2)
+(MakeValP  "first elsif in test - ")
+(Call #"writeln[f1]" 1)
+(Go _3)
+_2:
+(MakeValP  "first else in test - ")
+(Call #"writeln[f1]" 1)
+_3:
+_1:
+(FetchP 0)
+(MakeValP  2)
+(Call #"<[f2]" 2)
+(GoFalse _4)
+(MakeValP  "second if in test - ")
+(Call #"writeln[f1]" 1)
+(Go _5)
+_4:
+(MakeValP  "second else in test - ")
+(Call #"writeln[f1]" 1)
+_5:
+(FetchP 0)
+(MakeValP  0)
+(Call #">[f2]" 2)
+(GoFalse _6)
+(MakeValP  "third if in test - ")
+(Call #"writeln[f1]" 1)
+(Go _7)
+_6:
+(FetchP 0)
+(MakeValP  1)
+(Call #"-[f1]" 1)
+(Call #">[f2]" 2)
+(GoFalse _8)
+(MakeValP  "second-first elsif in test - ")
+(Call #"writeln[f1]" 1)
+(Go _9)
+_8:
+(FetchP 0)
+(MakeValP  2)
+(Call #"-[f1]" 1)
+(Call #">[f2]" 2)
+(GoFalse _10)
+(MakeValP  "second-second elsif in test - ")
+(Call #"writeln[f1]" 1)
+(Go _11)
+_10:
+(FetchP 0)
+(MakeValP  3)
+(Call #"-[f1]" 1)
+(Call #">[f2]" 2)
+(GoFalse _12)
+(MakeValP  "second-third elsif in test - ")
+(Call #"writeln[f1]" 1)
+(Go _13)
+_12:
+_13:
+_11:
+_9:
+_7:
+(FetchP 0)
+(MakeValP  1)
+(Call #"!=[f2]" 2)
+(GoFalse _14)
+(MakeValP  "fourth if in test - ")
+(Call #"writeln[f1]" 1)
+(Go _15)
+_14:
+_15:
+(Return)
+];
+}}
+*
+BASIS;

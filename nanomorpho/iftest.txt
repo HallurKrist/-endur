@@ -1,0 +1,54 @@
+main()
+{
+  iftest(1);
+}
+
+iftest(x)
+{
+  ;;;var x;
+  ;;;x = 1;
+  if ( x == 1 )
+  {
+    writeln( "first if in test - " );
+  }
+  elsif ( x != 1 )
+  {
+    writeln( "first elsif in test - " );
+  }
+  else
+  {
+    writeln( "first else in test - " );
+  };
+
+  if ( x < 2 )
+  {
+    writeln( "second if in test - " );
+  }
+  else 
+  {
+    writeln( "second else in test - " );
+  };
+
+  if ( x > 0 )
+  {
+    writeln( "third if in test - " );
+  }
+  elsif ( x > -1 )
+  {
+    writeln( "second-first elsif in test - " );
+  }
+  elsif ( x > -2 )
+  {
+    writeln( "second-second elsif in test - " );
+  }
+  elsif ( x > -3 ) 
+  {
+    writeln( "second-third elsif in test - " );
+  };
+
+  if ( x != 1)
+  {
+    writeln( "fourth if in test - " );
+  };
+
+}

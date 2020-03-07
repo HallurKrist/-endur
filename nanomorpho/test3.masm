@@ -1,6 +1,19 @@
+
 "test3.mexe" = main in
 !
 {{
+#"main[f0]" =
+[
+(MakeVal  1)
+(Call #"f1[f1]" 1)
+(Call #"writeln[f1]" 1)
+(MakeValP  1)
+(MakeValP  2)
+(MakeValP  3)
+(Call #"f2[f3]" 3)
+(Call #"writeln[f1]" 1)
+(Return)
+];
 #"f1[f1]" =
 [
 (MakeVal null)
@@ -16,6 +29,7 @@
 (Call #"*[f2]" 2)
 (Call #"+[f2]" 2)
 (Return)
+(Return)
 ];
 #"f2[f3]" =
 [
@@ -28,6 +42,8 @@
 (Call #"<[f2]" 2)
 (Call #"![f1]" 1)
 (GoFalse _0)
+(MakeValP  "1")
+(Call #"writeln[f1]" 1)
 (FetchP 3)
 (Call #"f1[f1]" 1)
 (Return)
@@ -41,6 +57,8 @@ _0:
 (Call #"==[f2]" 2)
 (Call #"||[f2]" 2)
 (GoFalse _2)
+(MakeValP  "2")
+(Call #"writeln[f1]" 1)
 (FetchP 0)
 (Return)
 (Go _3)
@@ -49,6 +67,8 @@ _2:
 (MakeValP  2)
 (Call #"==[f2]" 2)
 (GoFalse _4)
+(MakeValP  "3")
+(Call #"writeln[f1]" 1)
 (MakeValP  1)
 (MakeValP  2)
 (MakeValP  3)
@@ -59,6 +79,8 @@ _2:
 (Return)
 (Go _5)
 _4:
+(MakeValP  "4")
+(Call #"writeln[f1]" 1)
 (MakeValP  1)
 (MakeValP  2)
 (Call #"*[f2]" 2)
@@ -72,6 +94,7 @@ _4:
 _5:
 _3:
 _1:
+(Return)
 ];
 }}
 *
