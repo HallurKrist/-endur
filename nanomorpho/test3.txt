@@ -1,3 +1,8 @@
+main()
+{
+  writeln(f1(1));
+  writeln(f2(1, 2, 3));
+}
 f1(a1)
 {
   var v0;
@@ -10,18 +15,22 @@ f2(a1, a2, a3)
   v1 = 1;
   if (!(v1 < 1))
   {
+    writeln("1");
     return f1(v1);
   }
   elsif (v1 == 1 || v1 == 2)
   {
+    writeln("2");
     return a1;
   }
   elsif (v1 == 2)
   {
+    writeln("3");
     return 1:2:3:4;
   }
   else
   {
+    writeln("4");
     return 1*2*3+4*5;
   };
 }

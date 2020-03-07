@@ -699,7 +699,11 @@ public class Parser
             String labCont = newLabel();
             instr("Go", labCont);
             System.out.println(labElse + ":");
-            generateExpr((Object[]) e[3]);
+            if (e[3] != null)
+            {
+                generateExpr((Object[]) e[3]);
+            }
+            
             System.out.println(labCont + ":");
             break;
         case "WHILE":
