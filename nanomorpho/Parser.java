@@ -559,7 +559,7 @@ public class Parser
     {
         // function = [name,argcount,varcount,exprs]
         
-        System.out.println("#\"" + fun[0] + "[f" + fun[1] + "]\" =");
+        System.out.println("#\"" + fun[0] + "[f" + (Integer)fun[1] + "]\" =");
         
         
         System.out.println("[");
@@ -674,18 +674,24 @@ public class Parser
         case "CALL":
             // ["CALL",name,args]
             Object[] argsArr = (Object[]) e[2];
-            if (argsArr[0] instanceof String)
-            {
-                asExpr((Object[]) e[2]);
-                System.out.println("(Call #\"" + e[1] + "[f1]\" 1)");
-            }
-            else
-            {
-                int nargs = argsArr.length;
-                for (Object arg : argsArr)
-                    generateExpr((Object[]) arg);
-                System.out.println("(Call #\"" + e[1] + "[f" + nargs + "]\" " + nargs + ")");
-            }
+
+                if (argsArr.length == 0)
+                {
+                    System.out.println("(Call #\"" + e[1] + "[f0]\" 0)");
+                }
+                else if (argsArr[0] instanceof String)
+                {
+                    asExpr((Object[]) e[2]);
+                    System.out.println("(Call #\"" + e[1] + "[f1]\" 1)  ");
+                }
+                else
+                {
+                    int nargs = argsArr.length;
+                    for (Object arg : argsArr)
+                        generateExpr((Object[]) arg);
+                    System.out.println("(Call #\"" + e[1] + "[f" +  nargs + "]\" " + nargs + ")");
+                }
+            
             break;
         case "FETCH":
             System.out.println("(Fetch" + P() + (int)e[1] + ")");

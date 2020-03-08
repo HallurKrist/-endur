@@ -1,10 +1,12 @@
 main()
 {
-  whiletest(1); ;;; ekki hægt að hafa engin viðföng
+  whiletest(); ;;; ekki hægt að hafa engin viðföng
 }
 
-whiletest(x)
+whiletest()
 {
+  var x;
+  x = 1;
   while ( x < 10 )
   {
     writeln(x);
