@@ -1,0 +1,27 @@
+orf(a0, a1)
+  {
+    var v2;
+    writeln(a0);
+    writeln(a1);
+    ;;;if (v2 > v3 || v2 == v3)
+    ;;;{
+    ;;;  a0 = 1;
+    ;;;}
+    ;;;else
+    ;;;{
+    ;;;  a0 = 2;
+    ;;;};
+    v2 = a0 || a1;
+    writeln(v2);
+    return false || a0;
+  }
+main()
+{
+    writeln(orf(false, false));
+    writeln("");
+    writeln(orf(false, true));
+    writeln("");
+    writeln(orf(true, false));
+    writeln("");
+    writeln(orf(true, true));
+}

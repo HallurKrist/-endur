@@ -1,0 +1,68 @@
+if1(a0)
+  {
+    if (a0 < 10)
+    {
+      return 0;
+    };
+    return 1;
+  }
+if2(a2)
+  {
+    if (a2 == 0)
+    {
+      return -1;
+    }
+    elsif (a2 == 1)
+    {
+      return 0;
+    }
+    elsif (a2 == 2)
+    {
+      return 1;
+    }
+    else
+    {
+        return 2;
+    };
+  }
+if3(a0)
+  {
+    var v1;
+    v1 = 5;
+    if (a0 > 0)
+    { v1 = v1 + 5; };
+    v1 = v1 -1;
+    1 + 1;
+    v1 = v1 -1;
+    return v1;
+  }
+if4(a0)
+{
+  if (a0 < 1) { return 1; }
+  elsif (a0 == 1) { a0 =2; }
+  elsif (a0 == 2) { return -99; }
+  elsif (a0 == 3) { a0 = -55; };
+  return 17;
+}
+if5(a0)
+{
+  if (a0 < 1) { return 1; }
+  elsif (a0 == 1) { a0 =2; }
+  elsif (a0 == 2) { return -99; }
+  elsif (a0 == 3) { a0 = -55; }
+  else { a0 = 0; };
+  writeln(a0);
+  return 17;
+}
+main()
+{
+  writeln(if5(0));
+  writeln("");
+  writeln(if5(1));
+  writeln("");
+  writeln(if5(2));
+  writeln("");
+  writeln(if5(3));
+  writeln("");
+  writeln(if5(5));
+}
