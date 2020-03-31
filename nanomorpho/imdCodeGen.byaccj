@@ -47,12 +47,12 @@ function
 
 names
         :                       { $$ = 0; }
-        |       nonemptynames
+        |       nonemptynames   { $$ = $1; }
         ;
 
 nonemptynames
-        :       names ',' NAME  { addVar($1); $$ = $1 + 1 }
-        |       NAME            { addVar($1); $$ = $1 + 1 }
+        :       nonemptynames ',' NAME  { addVar($1); $$ = $1 + 1 }
+        |       NAME            { addVar($1); $$ = 1 }
         ;
 
 decl    :       VAR names ';'           { $$ = $2; }
